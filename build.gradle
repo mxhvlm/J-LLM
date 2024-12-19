@@ -1,0 +1,25 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.oppendev.jllm'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.9'
+    implementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.9'
+
+    implementation group: 'fr.inria.gforge.spoon', name: 'spoon-core', version: '10.1.0'
+    implementation group: 'org.neo4j.driver', name: 'neo4j-java-driver', version: '4.4.5'
+}
+
+test {
+    useJUnitPlatform()
+}
