@@ -17,11 +17,14 @@ public class FieldExporter extends Exporter {
             String modifiers = ctField.getModifiers().toString();
             String fieldSourceSnippet = ctField.toString(); // or a more refined snippet
 
-            LOGGER.info("Creating field node: " + declaringTypeName + "." + fieldName);
+            LOGGER.trace("Creating field node: " + declaringTypeName + "." + fieldName);
             _neo4jService.createFieldNode(declaringTypeName, fieldName, modifiers, fieldSourceSnippet);
+            if (fieldName.equals("DATA_BABY_ID")) {
+                LOGGER.info("Found field DATA_BABY_ID on type " + declaringTypeName);
+            }
 
             // Link field to its declaring type
-            LOGGER.info("Linking " + declaringTypeName + " to field " + fieldName);
+            LOGGER.trace("Linking " + declaringTypeName + " to field " + fieldName);
             _neo4jService.linkTypeHasField(declaringTypeName, declaringTypeName + "." + fieldName);
         }
     }
@@ -42,7 +45,7 @@ public class FieldExporter extends Exporter {
     private void linkFieldType(String declaringTypeName, String fieldName, CtTypeReference<?> fieldTypeRef) {
         // Resolve the field's type name
         String fieldTypeName = fieldTypeRef.getQualifiedName();
-        LOGGER.info("Linking field " + declaringTypeName + "." + fieldName + " to type " + fieldTypeName);
+        LOGGER.trace("Linking field " + declaringTypeName + "." + fieldName + " to type " + fieldTypeName);
         _neo4jService.linkFieldOfType(declaringTypeName + "." + fieldName, fieldTypeName);
 
         // Handle generics if any

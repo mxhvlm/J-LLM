@@ -5,6 +5,8 @@ import spoon.reflect.code.CtInvocation;
 import spoon.reflect.declaration.*;
 
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 public class ModelExtractor {
@@ -56,11 +58,17 @@ public class ModelExtractor {
     /**
      * Extract all fields from all types.
      */
-    public Set<CtField<?>> extractFields() {
+    public List<CtField<?>> extractFields() {
         LOGGER.info("ModelExtractor: Extracting fields...");
-        Set<CtField<?>> fields = new HashSet<>();
+        List<CtField<?>> fields = new LinkedList<>();
         for (CtType<?> type : extractTypes()) {
-            fields.addAll(type.getFields());
+            var _fields = type.getFields();
+            for (CtField<?> f : _fields) {
+                if (f.getSimpleName().equals("DATA_BABY_ID")) {
+                    LOGGER.info("Found field DATA_BABY_ID on type " + type.getQualifiedName());
+                }
+            }
+            fields.addAll(_fields);
         }
         LOGGER.info("ModelExtractor: Extracted " + fields.size() + " fields.");
         return fields;
@@ -70,9 +78,9 @@ public class ModelExtractor {
      * Extract all methods from all types.
      * Includes methods from classes, interfaces, etc.
      */
-    public Set<CtMethod<?>> extractMethods() {
+    public List<CtMethod<?>> extractMethods() {
         LOGGER.info("ModelExtractor: Extracting methods...");
-        Set<CtMethod<?>> methods = new HashSet<>();
+        List<CtMethod<?>> methods = new LinkedList<>();
         for (CtType<?> type : extractTypes()) {
             // getAllMethods() can be used if you need inherited methods too,
             // but usually type.getMethods() returns declared methods.

@@ -1,8 +1,10 @@
 package org.example.dbOutput;
 
 import org.example.sourceImport.ModelExtractor;
+import spoon.reflect.code.CtFieldAccess;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtParameter;
+import spoon.reflect.reference.CtFieldReference;
 import spoon.reflect.reference.CtTypeReference;
 
 public class MethodExporter extends Exporter {
@@ -13,16 +15,20 @@ public class MethodExporter extends Exporter {
 
     public void createMethodNodes() {
         for (CtMethod<?> ctMethod : _extractor.extractMethods()) {
-            String declaringTypeName = ctMethod.getDeclaringType().getQualifiedName();
-            String methodSignature = ctMethod.getSignature();
-            String modifiers = ctMethod.getModifiers().toString();
-            String sourceCode = ctMethod.toString();
-            String javadoc = ctMethod.getDocComment();
+            String declaringTypeName = safelyExtract(() -> ctMethod.getDeclaringType().getQualifiedName(), "ERROR");
+            String methodSignature = safelyExtract(ctMethod::getSignature, "ERROR");
+            String modifiers = safelyExtract(() -> ctMethod.getModifiers().toString(), "ERROR");
+            String sourceCode = SourceCodePrinter.printMethodSource(ctMethod);
 
-            LOGGER.info("Creating method node: " + declaringTypeName + "#" + methodSignature);
-            _neo4jService.createMethodNode(declaringTypeName, methodSignature, modifiers, sourceCode, javadoc);
+//            System.out.println("sourceCode: " + sourceCode + "\n\n");
 
-            LOGGER.info("Linking " + declaringTypeName + " to method " + methodSignature);
+            String javadoc = safelyExtract(ctMethod::getDocComment, "ERROR");
+            String methodName = safelyExtract(ctMethod::getSimpleName, "ERROR");
+
+            LOGGER.trace("Creating method node: " + declaringTypeName + "#" + methodSignature);
+            _neo4jService.createMethodNode(methodName, declaringTypeName, methodSignature, modifiers, sourceCode, javadoc);
+
+            LOGGER.trace("Linking " + declaringTypeName + " to method " + methodSignature);
             _neo4jService.linkTypeHasMethod(declaringTypeName, declaringTypeName + "#" + methodSignature);
         }
     }
@@ -43,6 +49,9 @@ public class MethodExporter extends Exporter {
                 linkMethodParameter(declaringTypeName, methodSignature, parameter);
             }
 
+            // Handle method -> field deps
+            linkMethodFieldDependencies(ctMethod, declaringTypeName, methodSignature);
+
             // If you want to consider thrown exceptions as dependencies:
             for (CtTypeReference<?> thrownRef : ctMethod.getThrownTypes()) {
                 // Store this in a dependency list for the DependenciesExporter later
@@ -53,7 +62,7 @@ public class MethodExporter extends Exporter {
 
     private void linkMethodReturnType(String declaringTypeName, String methodSignature, CtTypeReference<?> returnTypeRef) {
         String returnTypeName = returnTypeRef.getQualifiedName();
-        LOGGER.info("Linking method " + declaringTypeName + "#" + methodSignature + " returns " + returnTypeName);
+        LOGGER.trace("Linking method " + declaringTypeName + "#" + methodSignature + " returns " + returnTypeName);
         _neo4jService.linkMethodReturnsType(declaringTypeName + "#" + methodSignature, returnTypeName);
 
         // Handle generics in return type
@@ -72,7 +81,7 @@ public class MethodExporter extends Exporter {
         CtTypeReference<?> paramTypeRef = parameter.getType();
 
         String paramNodeId = _neo4jService.createParameterNode(declaringTypeName, methodSignature, paramName);
-        LOGGER.info("Linking method " + declaringTypeName + "#" + methodSignature + " has parameter " + paramName);
+        LOGGER.trace("Linking method " + declaringTypeName + "#" + methodSignature + " has parameter " + paramName);
         _neo4jService.linkMethodHasParameter(declaringTypeName + "#" + methodSignature, paramNodeId);
 
         // Link parameter of_type
@@ -89,6 +98,25 @@ public class MethodExporter extends Exporter {
         });
     }
 
+    private void linkMethodFieldDependencies(CtMethod<?> ctMethod, String declaringTypeName, String methodSignature) {
+        if (ctMethod.getBody() != null) {
+            ctMethod.getBody().filterChildren(CtFieldAccess.class::isInstance).forEach(access -> {
+                CtFieldAccess<?> fieldAccess = (CtFieldAccess<?>) access;
+                CtFieldReference<?> fieldRef = fieldAccess.getVariable();
+                String fieldDeclaringType = safelyExtract(() -> fieldRef.getDeclaringType().getQualifiedName(), "ERROR");
+                String fieldName = safelyExtract(fieldRef::getSimpleName, "ERROR");
+                String fieldFullName = fieldDeclaringType + "." + fieldName;
+
+                LOGGER.trace("Linking method " + declaringTypeName + "#" + methodSignature + " to field " + fieldFullName);
+                if (fieldRef.isStatic()) {
+                    _neo4jService.linkMethodDependsOnField(declaringTypeName + "#" + methodSignature, fieldFullName);
+                } else {
+                    _neo4jService.linkMethodDependsOnField(declaringTypeName + "#" + methodSignature, fieldDeclaringType + "." + fieldName);
+                }
+            });
+        }
+    }
+
     @Override
     public void export() {
         LOGGER.info("MethodExporter: Creating method nodes...");
@@ -98,5 +126,19 @@ public class MethodExporter extends Exporter {
         linkMethodSignatures();
 
         LOGGER.info("MethodExporter: Export complete.");
+    }
+
+    private <T> T safelyExtract(Extractor<T> extractor, T fallback) {
+        try {
+            return extractor.extract();
+        } catch (Exception e) {
+            LOGGER.error("Error during extraction: " + e.getMessage());
+            return fallback;
+        }
+    }
+
+    @FunctionalInterface
+    private interface Extractor<T> {
+        T extract() throws Exception;
     }
 }

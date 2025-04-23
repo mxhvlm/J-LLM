@@ -1,5 +1,6 @@
 package org.example.dbOutput;
 
+import org.example.data.Neo4jTypeObject;
 import org.example.sourceImport.ModelExtractor;
 import spoon.reflect.declaration.CtType;
 
@@ -29,11 +30,11 @@ public class TypeExporter extends Exporter {
             String modifiers = ctType.getModifiers().toString();
             String javadoc = ctType.getDocComment();
 
-            LOGGER.info("Creating type node: " + typeName);
-            _neo4jService.createTypeNode(typeName, simpleName, typeKind, modifiers, javadoc);
+            LOGGER.trace("Creating type node: " + typeName);
+//            _neo4jService.createTypeNode(new Neo4jTypeObject(typeName, simpleName, typeKind, modifiers, javadoc));
 
             String packageName = ctType.getPackage().getQualifiedName();
-            LOGGER.info("Linking type " + typeName + " to package " + packageName);
+            LOGGER.trace("Linking type " + typeName + " to package " + packageName);
             _neo4jService.linkPackageToType(packageName, typeName);
         }
     }
@@ -48,21 +49,21 @@ public class TypeExporter extends Exporter {
             // 1. Link nested types
             for (CtType<?> nestedType : ctType.getNestedTypes()) {
                 String childTypeName = nestedType.getQualifiedName();
-                LOGGER.info("Linking " + typeName + " to nested type " + childTypeName);
+                LOGGER.trace("Linking " + typeName + " to nested type " + childTypeName);
                 _neo4jService.linkTypeToType(typeName, childTypeName);
             }
 
             // 2. Link superclass
             if (ctType.getSuperclass() != null) {
                 String superTypeName = ctType.getSuperclass().getQualifiedName();
-                LOGGER.info("Linking " + typeName + " to superclass " + superTypeName);
+                LOGGER.trace("Linking " + typeName + " to superclass " + superTypeName);
                 _neo4jService.linkTypeExtends(typeName, superTypeName);
             }
 
             // 3. Link interfaces
             ctType.getSuperInterfaces().forEach(interfaceRef -> {
                 String interfaceName = interfaceRef.getQualifiedName();
-                LOGGER.info("Linking " + typeName + " to interface " + interfaceName);
+                LOGGER.trace("Linking " + typeName + " to interface " + interfaceName);
                 _neo4jService.linkTypeImplements(typeName, interfaceName);
             });
         }
@@ -72,6 +73,9 @@ public class TypeExporter extends Exporter {
      * Exporter entry point that runs the two-pass export process.
      */
     public void export() {
+        LOGGER.info("TypeExporter: Creating primary type nodes...");
+//        _neo4jService.createPrimitiveTypeNodes();
+
         LOGGER.info("TypeExporter: Running first pass (creating type nodes)...");
         createTypeNodes();
 
