@@ -84,7 +84,10 @@ public class MethodTransformerStep implements PipelineStep<List<CtMethod<?>>, Me
 //        }
 //    }
 
-    private Pair<List<Neo4jTypeArgumentNode>, List<Neo4JLinkObject>> linkMethodReturnType(String declaringTypeName, String methodSignature, CtTypeReference<?> returnTypeRef) {
+    private Pair<List<Neo4jTypeArgumentNode>, List<Neo4JLinkObject>> linkMethodReturnType(String declaringTypeName, String methodSignature, CtTypeReference<?> returnTypeRef) throws Exception {
+        if (returnTypeRef == null) {
+            throw new Exception("Return type for method " + declaringTypeName + "#" + methodSignature + " is null");
+        }
         String returnTypeName = safelyExtract(returnTypeRef::getQualifiedName, "ERROR");
         LOGGER.trace("Linking method " + declaringTypeName + "#" + methodSignature + " returns " + returnTypeName);
         List<Neo4JLinkObject> links = new LinkedList<>();
@@ -230,11 +233,14 @@ public class MethodTransformerStep implements PipelineStep<List<CtMethod<?>>, Me
                 typeArgs.addAll(paramLinks.getMiddle());
             });
 
-            Pair<List<Neo4jTypeArgumentNode>, List<Neo4JLinkObject>> returnTypeLinks = linkMethodReturnType(ctMethod.getDeclaringType().getQualifiedName(), ctMethod.getSignature(), ctMethod.getType());
-
-            links.addAll(returnTypeLinks.getRight());
+            try {
+                Pair<List<Neo4jTypeArgumentNode>, List<Neo4JLinkObject>> returnTypeLinks = linkMethodReturnType(ctMethod.getDeclaringType().getQualifiedName(), ctMethod.getSignature(), ctMethod.getType());
+                typeArgs.addAll(returnTypeLinks.getLeft());
+                links.addAll(returnTypeLinks.getRight());
+            } catch (Exception ex) {
+                LOGGER.error("Error linking method return type: " + ex.getMessage());
+            }
             links.addAll(linkMethodFieldDependencies(ctMethod, ctMethod.getDeclaringType().getQualifiedName(), ctMethod.getSignature()));
-            typeArgs.addAll(returnTypeLinks.getLeft());
         });
         return new MethodTransformResult(methodObjects, params, links, typeArgs);
     }

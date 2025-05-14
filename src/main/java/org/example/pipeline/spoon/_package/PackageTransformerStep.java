@@ -1,77 +1,53 @@
 package org.example.pipeline.spoon._package;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.example.data.Neo4JLinkObject;
 import org.example.data.Neo4jPackageObject;
 import org.example.pipeline.PipelineStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Stream;
 
-public class PackageTransformerStep implements PipelineStep<Set<String>, Pair<List<Neo4jPackageObject>, List<Neo4JLinkObject>>> {
+public class PackageTransformerStep implements PipelineStep<Stream<String>, Stream<PackageTransformerStep.PackageOutput>> {
     private static final Logger LOGGER = LoggerFactory.getLogger(PackageTransformerStep.class);
-    private final Set<String> _createdPackages;
 
-    public PackageTransformerStep() {
-        _createdPackages = new HashSet<>();
-    }
+    public sealed interface PackageOutput permits PackageNode, PackageLink {}
+    public record PackageNode(Neo4jPackageObject object) implements PackageOutput {}
+    public record PackageLink(Neo4JLinkObject link) implements PackageOutput {}
+
 
     @Override
-    public Pair<List<Neo4jPackageObject>, List<Neo4JLinkObject>> process(Set<String> input) {
+    public Stream<PackageOutput> process(Stream<String> input) {
         LOGGER.info("PackageExporter: Exporting packages...");
-//        input.forEach(this::createPackageHierarchy);
-        return input.stream().map(this::createPackageHierarchy).reduce(
-                Pair.of(new LinkedList<>(), new LinkedList<>()), (acc, pair) -> {
-                    acc.getLeft().addAll(pair.getLeft());
-                    acc.getRight().addAll(pair.getRight());
-                    return acc;
-        });
+        return input.flatMap(this::createPackageHierarchy).distinct();
     }
 
-    private Pair<List<Neo4jPackageObject>, List<Neo4JLinkObject>> createPackageHierarchy(String fullPackageName) {
+    private Stream<PackageOutput> createPackageHierarchy(String fullPackageName) {
         String[] parts = fullPackageName.split("\\.");
-        String parentPath = null;
-        String currentPath = null;
 
-        List<Neo4jPackageObject> packages = new LinkedList<>();
-        List<Neo4JLinkObject> packageToPackageLinks = new LinkedList<>();
+        List<PackageOutput> results = new ArrayList<>();
+
+        String parentPath = null;
+        String currentPath;
 
         for (int i = 0; i < parts.length; i++) {
-            if (i == 0) {
-                currentPath = parts[i];
-            } else {
-                currentPath = parentPath + "." + parts[i];
-            }
-
-            // Only create the package node if it hasn't been created before
-            if (!_createdPackages.contains(currentPath)) {
-                packages.add(new Neo4jPackageObject(currentPath, parts[i]));
-
-                _createdPackages.add(currentPath);
-            }
-
-            // Link the parent to the child package
+            currentPath = (i == 0) ? parts[i] : parentPath + "." + parts[i];
+            results.add(new PackageNode(new Neo4jPackageObject(currentPath, parts[i])));
             if (parentPath != null) {
-                // This uses MERGE, so it's safe even if the relationship already exists
-//                _neo4jService.linkPackageToParent(parentPath, currentPath);
-//            TODO: Check if this is still using MERGE or if we're causing issues by creating duplicate relationships
-                packageToPackageLinks.add(
-                        Neo4JLinkObject.Builder.create()
-                                .withLabel("CONTAINS_PACKAGE")
-                                .betweenLabels("Package")
-                                .betweenProps("name")
-                                .parentValue(parentPath)
-                                .childValue(currentPath)
-                                .build());
-            }
+                Neo4JLinkObject link = Neo4JLinkObject.Builder.create()
+                        .withLabel("CONTAINS_PACKAGE")
+                        .betweenLabels("Package")
+                        .betweenProps("name")
+                        .parentValue(parentPath)
+                        .childValue(currentPath)
+                        .build();
 
+                results.add(new PackageLink(link));
+            }
             parentPath = currentPath;
         }
-
-        return Pair.of(packages, packageToPackageLinks);
+        return results.stream();
     }
 }
+

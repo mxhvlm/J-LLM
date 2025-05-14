@@ -19,16 +19,16 @@ public class ModelBuilder {
     private boolean _enableAutoImports = true;
     private String _modelName = "Model";
 
-    private static class ExtractorListProcessor<T extends CtElement> extends AbstractProcessor<T> {
-        private final List<T> _results;
-        public ExtractorListProcessor(List<T> resultList) {
-             _results = resultList;
-        }
-        @Override
-        public void process(T element) {
-            _results.add(element);
-        }
-    }
+//    private static class ExtractorListProcessor<T extends CtElement> extends AbstractProcessor<T> {
+//        private final List<T> _results;
+//        public ExtractorListProcessor(List<T> resultList) {
+//             _results = resultList;
+//        }
+//        @Override
+//        public void process(T element) {
+//            _results.add(element);
+//        }
+//    }
 
     public ModelBuilder() {
         _inputResourcePaths = new LinkedList<>();
@@ -75,9 +75,9 @@ public class ModelBuilder {
         List<CtType<?>> allTypes = new ArrayList<>();
         List<CtMethod<?>> allMethods = new ArrayList<>();
         List<CtParameter<?>> allParameters = new ArrayList<>();
-        spoon.addProcessor(new ExtractorListProcessor<>(allTypes));
-        spoon.addProcessor(new ExtractorListProcessor<>(allMethods));
-        spoon.addProcessor(new ExtractorListProcessor<>(allParameters));
+//        spoon.addProcessor(new ExtractorListProcessor<>(allTypes));
+//        spoon.addProcessor(new ExtractorListProcessor<>(allMethods));
+//        spoon.addProcessor(new ExtractorListProcessor<>(allParameters));
         CodeModel codeModel = new CodeModel(spoon.buildModel(), _modelName, allTypes, allMethods, allParameters);
         LOGGER.info("Model built successfully.");
         return codeModel;

@@ -9,18 +9,20 @@ import org.example.pipeline.PipelineStep;
 import org.example.pipeline.TransformResult;
 import org.neo4j.driver.Values;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class TypeLoaderStep extends AbstractNeo4jLoaderStep
-        implements PipelineStep<Pair<List<Neo4jTypeObject>, List<Neo4JLinkObject>>, TransformResult> {
+        implements PipelineStep<Stream<TypeTransformer.TypeOutput>, TransformResult> {
 
     public TypeLoaderStep(Neo4jService neo4jService) {
         super(neo4jService);
     }
 
     private void createTypeNode(Neo4jTypeObject node) {
-        // Using MERGE because we might reference the same type multiple times:
-        _neo4jService.runCypher(
+//             Using MERGE because we might reference the same type multiple times:
+        _neo4jService.runCypherThreadsafe(
                 "MERGE (t:Type { name: $typeName }) " +
                         "SET t.simpleName = $simpleName, " +
                         "    t.typeKind = $typeKind, " +
@@ -39,14 +41,24 @@ public class TypeLoaderStep extends AbstractNeo4jLoaderStep
     }
 
     @Override
-    public TransformResult process(Pair<List<Neo4jTypeObject>, List<Neo4JLinkObject>> input) {
-        _neo4jService.startSessionAndTransaction();
+    public TransformResult process(Stream<TypeTransformer.TypeOutput> input) {
+//        _neo4jService.startSessionAndTransaction();
 
         createPrimitiveTypeNodes();
-        input.getLeft().forEach(this::createTypeNode);
-        input.getRight().forEach(_neo4jService::creatLinkNode);
-        _neo4jService.commitTransactionAndCloseSession();
+        List<TypeTransformer.TypeNode> nodes = new ArrayList<>();
+        List<Neo4JLinkObject> links = new ArrayList<>();
+        input.forEach(output -> {
+            if (output instanceof TypeTransformer.TypeNode tn) {
+                nodes.add(tn);
+            } else if (output instanceof TypeTransformer.TypeLink tl) {
+                links.add(tl.link());
+            }
+        });
+        // Phase 1: Insert all types
+        nodes.parallelStream().forEach(n -> createTypeNode(n.object()));
 
+        // Phase 2: Insert all links (after all nodes exist)
+        links.parallelStream().forEach(_neo4jService::creatLinkNode);
         return new TransformResult();
     }
 }

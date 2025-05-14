@@ -1,52 +1,14 @@
 package org.example.data;
 
-public class Neo4JLinkObject {
-    private final String _label;
-    private final String _node1;
-    private final String _node2;
-    private final String _node1Label;
-    private final String _node2Label;
-    private final String _node1Prop;
-    private final String _node2Prop;
-
-    private Neo4JLinkObject(String label, String node1, String node2, String node1Label, String node2Label, String node1Prop, String node2Prop) {
-        _label = label;
-        _node1 = node1;
-        _node2 = node2;
-        _node1Label = node1Label;
-        _node2Label = node2Label;
-        _node1Prop = node1Prop;
-        _node2Prop = node2Prop;
-    }
-
-    public String getLabel() {
-        return _label;
-    }
-
-    public String getFirstNode() {
-        return _node1;
-    }
-
-    public String getSecondNode() {
-        return _node2;
-    }
-
-    public String getFirstNodeLabel() {
-        return _node1Label;
-    }
-
-    public String getSecondNodeLabel() {
-        return _node2Label;
-    }
-
-    public String getFirstNodeProp() {
-        return _node1Prop;
-    }
-
-    public String getSecondNodeProp() {
-        return _node2Prop;
-    }
-
+public record Neo4JLinkObject(
+        String label,
+        String node1,
+        String node2,
+        String node1Label,
+        String node2Label,
+        String node1Prop,
+        String node2Prop
+) {
     public static class Builder {
             private String _label;
         private String _node1;

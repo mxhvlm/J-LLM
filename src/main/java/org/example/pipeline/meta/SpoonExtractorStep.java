@@ -41,35 +41,35 @@ public class SpoonExtractorStep extends AbstractNeo4jMetaStep {
                 .then(new TypeLoaderStep(neo4jService))
                 .build();
 
-        Pipeline<CodeModel, TransformResult> fieldPipeline = Pipeline
-                .start(new TypeExtractorStep())
-                .then(new FieldExtractorStep())
-                .then(new FieldTransformerStep())
-                .then(new FieldLoaderStep(neo4jService))
-                .build();
+//        Pipeline<CodeModel, TransformResult> fieldPipeline = Pipeline
+//                .start(new TypeExtractorStep())
+//                .then(new FieldExtractorStep())
+//                .then(new FieldTransformerStep())
+//                .then(new FieldLoaderStep(neo4jService))
+//                .build();
+//
+//        Pipeline<CodeModel, TransformResult> methodPipeline = Pipeline
+//                .start(new TypeExtractorStep())
+//                .then(new MethodExtractorStep())
+//                .then(new MethodTransformerStep())
+//                .then(new MethodLoadJsonStep())
+//                .then(new MethodLoadStep())
+//                .build();
+//
+//        Pipeline<CodeModel, TransformResult> callGraphPipeline = Pipeline
+//                .start(new TypeExtractorStep())
+//                .then(new MethodExtractorStep())
+//                .then(new CallGraphTransformerStep())
+//                .then(new GenericLinkLoaderStep(neo4jService))
+//                .build();
 
-        Pipeline<CodeModel, TransformResult> methodPipeline = Pipeline
-                .start(new TypeExtractorStep())
-                .then(new MethodExtractorStep())
-                .then(new MethodTransformerStep())
-                .then(new MethodLoadJsonStep())
-                .then(new MethodLoadStep())
-                .build();
-
-        Pipeline<CodeModel, TransformResult> callGraphPipeline = Pipeline
-                .start(new TypeExtractorStep())
-                .then(new MethodExtractorStep())
-                .then(new CallGraphTransformerStep())
-                .then(new GenericLinkLoaderStep(neo4jService))
-                .build();
-
-        neo4jService.startSessionAndTransaction();
+//        neo4jService.startSessionAndTransaction();
         packagePipeline.run(model);
         typePipeline.run(model);
-        fieldPipeline.run(model);
-        methodPipeline.run(model);
-        callGraphPipeline.run(model);
-        neo4jService.commitTransactionAndCloseSession();
+//        fieldPipeline.run(model);
+//        methodPipeline.run(model);
+//        callGraphPipeline.run(model);
+//        neo4jService.commitTransactionAndCloseSession();
 
         return neo4jService;
     }

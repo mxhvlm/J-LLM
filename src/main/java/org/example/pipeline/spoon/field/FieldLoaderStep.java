@@ -20,20 +20,20 @@ public class FieldLoaderStep extends AbstractNeo4jLoaderStep
 
     public void createFieldNode(Neo4jFieldObject field) {
         String fieldNodeId = field.getDeclaringTypeName() + "." + field.getFieldName();
-        _neo4jService.runCypher(
-                "MERGE (f:Field {id: $fieldId}) " +
-                        "SET f.name = $fieldName, f.modifiers = $modifiers, f.sourceCodeSnippet = $sourceSnippet",
-                Values.parameters("fieldId", fieldNodeId, "fieldName", field.getFieldName(),
-                        "modifiers", field.getModifiers(), "sourceSnippet", field.getFieldSourceSnippet())
-        );
+//        _neo4jService.runCypher(
+//                "MERGE (f:Field {id: $fieldId}) " +
+//                        "SET f.name = $fieldName, f.modifiers = $modifiers, f.sourceCodeSnippet = $sourceSnippet",
+//                Values.parameters("fieldId", fieldNodeId, "fieldName", field.getFieldName(),
+//                        "modifiers", field.getModifiers(), "sourceSnippet", field.getFieldSourceSnippet())
+//        );
     }
 
     @Override
     public TransformResult process(Pair<List<Neo4jFieldObject>, List<Neo4JLinkObject>> input) {
-        _neo4jService.startSessionAndTransaction();
+//        _neo4jService.startSessionAndTransaction();
         input.getLeft().forEach(this::createFieldNode);
         input.getRight().forEach(_neo4jService::creatLinkNode);
-        _neo4jService.commitTransactionAndCloseSession();
+//        _neo4jService.commitTransactionAndCloseSession();
         return new TransformResult();
     }
 }
