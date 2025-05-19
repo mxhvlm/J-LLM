@@ -1,7 +1,16 @@
 package org.example;
 
 import org.example.dbOutput.*;
+import org.example.llm.APIConfig;
+import org.example.llm.ILLMProvider;
+import org.example.llm.LLMConfig;
+import org.example.llm.providerImpl.OpenAIProvider;
 import org.example.pipeline.Pipeline;
+import org.example.pipeline.llm.CreateEmbeddingStep;
+import org.example.pipeline.llm.ExplanationSummaryPreprocessedPipeline;
+import org.example.pipeline.llm.explanation.LLMExplanationPipelineStep;
+import org.example.pipeline.llm.forumThreads.ForumThreadsPipeline;
+import org.example.pipeline.llm.forumThreads.ForumThreadsPipelinePreprocessed;
 import org.example.pipeline.meta.CreateIndeciesAndConstraintsStep;
 import org.example.pipeline.meta.PurgeDatabaseStep;
 import org.example.pipeline.meta.SpoonExtractorStep;
@@ -14,15 +23,52 @@ public class JLLM implements Runnable {
     private final JLLMConfig _config;
     private final Pipeline<Neo4jService, Neo4jService> _metaPipeline;
 
+    private APIConfig readOpenAIConfig() {
+        String apiToken = System.getenv("OPENAI_API_KEY");
+        String apiUrl = System.getenv("OPENAI_API_URL");
+
+        if (apiToken == null || apiUrl == null) {
+            LOGGER.error("OpenAI API key or URL not set in environment variables.");
+            throw new IllegalStateException("OpenAI API key or URL not set in environment variables.");
+        }
+        return new APIConfig(apiUrl, apiToken);
+    }
+
     public JLLM() {
         LOGGER.info("JLLM: Initializing...");
         _config = new JLLMConfig();
 
-        _metaPipeline = Pipeline
-                .start(new PurgeDatabaseStep())
-                .then(new CreateIndeciesAndConstraintsStep())
-                .then(new SpoonExtractorStep())
-                .build();
+//        _metaPipeline = Pipeline
+//                .start(new PurgeDatabaseStep())
+//                .then(new CreateIndeciesAndConstraintsStep())
+//                .then(new SpoonExtractorStep())
+//                .then(new ForumThreadsPipelinePreprocessed("1.19_candidate_posts_transformed.json"))
+//                .build();
+
+//        _metaPipeline = Pipe[line
+//            .start(new ExplanationSummaryPreprocessedPipeline())
+//            .build();
+        _metaPipeline = Pipeline.start(new CreateEmbeddingStep("Explanation", "text", "explanationIndex"))
+            .then(new CreateEmbeddingStep("Summary", "text", "summaryIndex"))
+            .build();
+
+        ILLMProvider llmProvider = new OpenAIProvider(readOpenAIConfig());
+        LLMConfig explanationConfig = LLMConfig.Builder.defaultConfig()
+            .withContextLength(16384)
+            .withModel("gpt-3.5-turbo")
+            .withTemperature(0.41)
+            .withTopK(100)
+            .withTopP(0.9)
+            .build();
+
+//        _metaPipeline = Pipeline
+//                .start(new LLMExplanationPipelineStep(llmProvider, explanationConfig, 1))
+//                .build();
+//        _metaPipeline = Pipeline
+//            .start(new ForumThreadsPipelinePreprocessed( "1.19_candidate_posts_transformed.json"))
+//            .build();
+
+        LOGGER.info("JLLM: Initialization complete.");
     }
 
     @Override

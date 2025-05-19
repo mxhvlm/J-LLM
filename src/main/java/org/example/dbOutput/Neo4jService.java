@@ -1,78 +1,56 @@
 package org.example.dbOutput;
 
-import org.example.data.Neo4JLinkObject;
+import org.example.data.neo4j.Neo4JLink;
 import org.neo4j.driver.*;
-import org.neo4j.driver.exceptions.TransientException;
 import org.slf4j.Logger;
 import spoon.reflect.reference.CtTypeReference;
 
 import java.util.UUID;
 
 public class Neo4jService implements AutoCloseable {
-    private final Driver driver;
-    private final ThreadLocal<Session> threadSession;
-    private final ThreadLocal<Transaction> threadTransaction;
+    private final Driver _driver;
+    private final Session _session;
+    private Transaction _transaction;
 
     private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(Neo4jService.class);
 
     public Neo4jService(String uri, String user, String password) {
         LOGGER.info("Connecting to Neo4j at " + uri + " with user " + user);
-        this.driver = GraphDatabase.driver(uri, AuthTokens.basic(user, password));
+        this._driver = GraphDatabase.driver(uri, AuthTokens.basic(user, password));
         LOGGER.info("Verifying connectivity...");
-        this.driver.verifyConnectivity();
+        this._driver.verifyConnectivity();
 
-        threadSession = ThreadLocal.withInitial(() -> driver.session());
-        threadTransaction = ThreadLocal.withInitial(() -> threadSession.get().beginTransaction());
-
+        _session = _driver.session();
         LOGGER.info("Connection successful.");
     }
 
-    public void runCypherThreadsafe(String cypher, Value parameters) {
-        int attempts = 0;
-        while (true) {
-            try {
-                Transaction tx = threadTransaction.get();
-                tx.run(cypher, parameters);
-                return;
-            } catch (TransientException ex) {
-                attempts++;
-                if (attempts >= 5) {
-                    LOGGER.error("Too many retries for cypher: {}", cypher);
-                    throw ex;
-                }
-                LOGGER.warn("Deadlock detected, retrying transaction... (attempt {})", attempts);
-                resetThreadTransaction(); // rollback and get a new one
-            }
+    public void beginTransaction() {
+        if (_session == null || !_session.isOpen()) {
+            throw new IllegalStateException("Session is not open. Did you call beginThreadTransaction()?");
+        }
+        if (_transaction == null || !_transaction.isOpen()) {
+            _transaction = _session.beginTransaction();
+        }
+    }
+    public Result runCypher(String cypher) {
+        return runCypher(cypher, Values.parameters());
+    }
+
+    public Result runCypher(String cypher, Value parameters) {
+        if (parameters.isEmpty()) {
+            return _transaction.run(cypher);
+        } else {
+            return _transaction.run(cypher, parameters);
         }
     }
 
-    private void resetThreadTransaction() {
+    public void commitTransactionIfPresent() {
         try {
-            Transaction tx = threadTransaction.get();
-            if (tx != null && tx.isOpen()) {
-                tx.rollback();
-            }
-        } catch (Exception ignored) {}
-        threadTransaction.remove();
-        threadTransaction.set(driver.session().beginTransaction());
-    }
-
-
-    public void commitThreadTransactionIfPresent() {
-        try {
-            Transaction tx = threadTransaction.get();
-            if (tx != null && tx.isOpen()) {
-                tx.commit();
-            }
-            Session session = threadSession.get();
-            if (session != null && session.isOpen()) {
-                session.close();
+            if (_transaction != null && _transaction.isOpen()) {
+                _transaction.commit();
             }
         } catch (Exception e) {
             LOGGER.error("Commit failed", e);
-        } finally {
-            threadTransaction.remove();
-            threadSession.remove();
         }
     }
 
@@ -98,7 +76,7 @@ public class Neo4jService implements AutoCloseable {
 //    }
 
     public Driver getDriver() {
-        return driver;
+        return _driver;
     }
 
     // Instead of opening and closing sessions/transactions in every method,
@@ -111,7 +89,7 @@ public class Neo4jService implements AutoCloseable {
 //    }
 
     public void runInThreadTransactionThreadSafe(String cypher, Value parameters) {
-        try (Session session = driver.session()) {
+        try (Session session = _driver.session()) {
             session.writeTransaction(tx -> {
                 tx.run(cypher, parameters);
                 return null;
@@ -133,12 +111,12 @@ public class Neo4jService implements AutoCloseable {
 
     public void createModuleNode(String moduleName) {
         // If we assume each moduleName is unique and new:
-        runCypherThreadsafe("CREATE (m:Module { name: $moduleName })",
+        runCypher("CREATE (m:Module { name: $moduleName })",
                 Values.parameters("moduleName", moduleName));
     }
 
     public void linkPackageToParent(String parentPackageName, String childPackageName) {
-        runCypherThreadsafe(
+        runCypher(
                 "MATCH (parent:Package {name: $parentPackageName}), (child:Package {name: $childPackageName}) " +
                         "MERGE (parent)-[:CONTAINS_PACKAGE]->(child)",
                 Values.parameters("parentPackageName", parentPackageName, "childPackageName", childPackageName)
@@ -146,17 +124,14 @@ public class Neo4jService implements AutoCloseable {
     }
 
     public void linkModuleToPackage(String moduleName, String packageName) {
-        runCypherThreadsafe(
+        runCypher(
                 "MATCH (m:Module {name: $moduleName}), (p:Package {name: $packageName}) " +
                         "MERGE (m)-[:CONTAINS_PACKAGE]->(p)",
                 Values.parameters("moduleName", moduleName, "packageName", packageName));
     }
 
-    // TODO: Add params to set the names of the props we want to link by
-    // Parent and child labels
-    // Parent and child props
-    public void creatLinkNode(Neo4JLinkObject linkObject) {
-        runCypherThreadsafe(
+    public void creatLinkNode(Neo4JLink linkObject) {
+        runCypher(
                 "MATCH (parent:" + linkObject.node1Label() + " {" + linkObject.node1Prop() + ": $leftName}), (child:" + linkObject.node2Label() + " {" + linkObject.node2Prop() + ": $rightName}) " +
                         "MERGE (parent)-[:" + linkObject.label() + "]->(child)",
                 Values.parameters("leftName", linkObject.node1(), "rightName", linkObject.node2())
@@ -164,7 +139,7 @@ public class Neo4jService implements AutoCloseable {
     }
 
     public void linkPackageToType(String packageName, String typeName) {
-        runCypherThreadsafe(
+        runCypher(
                 "MATCH (p:Package {name: $packageName}), (t:Type {name: $typeName}) " +
                         "MERGE (p)-[:CONTAINS_TYPE]->(t)",
                 Values.parameters("packageName", packageName, "typeName", typeName)
@@ -172,7 +147,7 @@ public class Neo4jService implements AutoCloseable {
     }
 
     public void linkTypeToType(String parentTypeName, String childTypeName) {
-        runCypherThreadsafe(
+        runCypher(
                 "MATCH (parent:Type {name: $parentTypeName}), (child:Type {name: $childTypeName}) " +
                         "MERGE (parent)-[:CONTAINS_TYPE]->(child)",
                 Values.parameters("parentTypeName", parentTypeName, "childTypeName", childTypeName)
@@ -180,7 +155,7 @@ public class Neo4jService implements AutoCloseable {
     }
 
     public void linkTypeExtends(String subTypeName, String superTypeName) {
-        runCypherThreadsafe(
+        runCypher(
                 "MATCH (sub:Type {name: $subTypeName}), (super:Type {name: $superTypeName}) " +
                         "MERGE (sub)-[:EXTENDS]->(super)",
                 Values.parameters("subTypeName", subTypeName, "superTypeName", superTypeName)
@@ -188,7 +163,7 @@ public class Neo4jService implements AutoCloseable {
     }
 
     public void linkTypeImplements(String typeName, String interfaceName) {
-        runCypherThreadsafe(
+        runCypher(
                 "MATCH (t:Type {name: $typeName}), (i:Type {name: $interfaceName}) " +
                         "MERGE (t)-[:IMPLEMENTS]->(i)",
                 Values.parameters("typeName", typeName, "interfaceName", interfaceName)
@@ -197,7 +172,7 @@ public class Neo4jService implements AutoCloseable {
 
     public void createFieldNode(String declaringTypeName, String fieldName, String modifiers, String fieldSourceSnippet) {
         String fieldNodeId = declaringTypeName + "." + fieldName;
-        runCypherThreadsafe(
+        runCypher(
                 "MERGE (f:Field {id: $fieldId}) " +
                         "SET f.name = $fieldName, f.modifiers = $modifiers, f.sourceCodeSnippet = $sourceSnippet",
                 Values.parameters("fieldId", fieldNodeId, "fieldName", fieldName,
@@ -206,7 +181,7 @@ public class Neo4jService implements AutoCloseable {
     }
 
     public void linkTypeHasField(String declaringTypeName, String fieldNodeId) {
-        runCypherThreadsafe(
+        runCypher(
                 "MATCH (t:Type {name: $typeName}), (f:Field {id: $fieldId}) " +
                         "MERGE (t)-[:HAS_FIELD]->(f)",
                 Values.parameters("typeName", declaringTypeName, "fieldId", fieldNodeId)
@@ -214,7 +189,7 @@ public class Neo4jService implements AutoCloseable {
     }
 
     public void linkFieldOfType(String fieldNodeId, String fieldTypeName) {
-        runCypherThreadsafe(
+        runCypher(
                 "MATCH (f:Field {id: $fieldId}), (t:Type {name: $fieldTypeName}) " +
                         "MERGE (f)-[:OF_TYPE]->(t)",
                 Values.parameters("fieldId", fieldNodeId, "fieldTypeName", fieldTypeName)
@@ -225,7 +200,7 @@ public class Neo4jService implements AutoCloseable {
         String argId = UUID.randomUUID().toString();
         boolean isWildcard = typeArgRef != null && typeArgRef.toString().contains("?");
         String variance = ""; // currently unused
-        runCypherThreadsafe(
+        runCypher(
                 "MERGE (arg:TypeArgument {id: $argId}) " +
                         "SET arg.isWildcard = $isWildcard, arg.variance = $variance",
                 Values.parameters("argId", argId, "isWildcard", isWildcard, "variance", variance)
@@ -234,7 +209,7 @@ public class Neo4jService implements AutoCloseable {
     }
 
     public void linkFieldHasTypeArgument(String fieldNodeId, String argId) {
-        runCypherThreadsafe(
+        runCypher(
                 "MATCH (f:Field {id: $fieldId}), (arg:TypeArgument {id: $argId}) " +
                         "MERGE (f)-[:HAS_TYPE_ARGUMENT]->(arg)",
                 Values.parameters("fieldId", fieldNodeId, "argId", argId)
@@ -242,7 +217,7 @@ public class Neo4jService implements AutoCloseable {
     }
 
     public void linkTypeArgumentOfType(String argId, String typeName) {
-        runCypherThreadsafe(
+        runCypher(
                 "MATCH (arg:TypeArgument {id: $argId}), (t:Type {name: $typeName}) " +
                         "MERGE (arg)-[:OF_TYPE]->(t)",
                 Values.parameters("argId", argId, "typeName", typeName)
@@ -251,7 +226,7 @@ public class Neo4jService implements AutoCloseable {
 
     public void createMethodNode(String methodName, String declaringTypeName, String methodSignature, String modifiers, String sourceCode, String javadoc) {
         String methodNodeId = declaringTypeName + "#" + methodSignature;
-        try (Session session = driver.session()) {
+        try (Session session = _driver.session()) {
             session.writeTransaction(tx -> {
                 tx.run(
                         "MERGE (m:Method {id: $methodId}) " +
@@ -273,7 +248,7 @@ public class Neo4jService implements AutoCloseable {
     }
 
     public void linkTypeHasMethod(String declaringTypeName, String methodNodeId) {
-        runCypherThreadsafe(
+        runCypher(
                 "MATCH (t:Type {name: $typeName}), (m:Method {id: $methodId}) " +
                         "MERGE (t)-[:HAS_METHOD]->(m)",
                 Values.parameters("typeName", declaringTypeName, "methodId", methodNodeId)
@@ -281,7 +256,7 @@ public class Neo4jService implements AutoCloseable {
     }
 
     public void linkMethodReturnsType(String methodNodeId, String returnTypeName) {
-        runCypherThreadsafe(
+        runCypher(
                 "MATCH (m:Method {id: $methodId}), (t:Type {name: $returnTypeName}) " +
                         "MERGE (m)-[:RETURNS]->(t)",
                 Values.parameters("methodId", methodNodeId, "returnTypeName", returnTypeName)
@@ -289,7 +264,7 @@ public class Neo4jService implements AutoCloseable {
     }
 
     public void linkMethodHasReturnTypeArgument(String methodNodeId, String argId) {
-        runCypherThreadsafe(
+        runCypher(
                 "MATCH (m:Method {id: $methodId}), (arg:TypeArgument {id: $argId}) " +
                         "MERGE (m)-[:HAS_RETURN_TYPE_ARGUMENT]->(arg)",
                 Values.parameters("methodId", methodNodeId, "argId", argId)
@@ -297,7 +272,7 @@ public class Neo4jService implements AutoCloseable {
     }
 
     public void linkMethodDependsOnField(String methodNodeId, String fieldNodeId) {
-        runCypherThreadsafe(
+        runCypher(
                 "MATCH (m:Method {id: $methodId}), (f:Field {id: $fieldId}) " +
                         "MERGE (m)-[:DEPENDS_ON]->(f)",
                 Values.parameters("methodId", methodNodeId, "fieldId", fieldNodeId)
@@ -306,7 +281,7 @@ public class Neo4jService implements AutoCloseable {
 
     public String createParameterNode(String declaringTypeName, String methodSignature, String paramName) {
         String paramId = declaringTypeName + "#" + methodSignature + ":" + paramName;
-        runCypherThreadsafe(
+        runCypher(
                 "MERGE (p:Parameter {id: $paramId}) " +
                         "SET p.name = $paramName, " + // Ensure "name" is set
                         "    p.displayName = $paramName",  // Optionally add displayName for clarity
@@ -316,7 +291,7 @@ public class Neo4jService implements AutoCloseable {
     }
 
     public void linkMethodHasParameter(String methodNodeId, String paramNodeId) {
-        runCypherThreadsafe(
+        runCypher(
                 "MATCH (m:Method {id: $methodId}), (p:Parameter {id: $paramId}) " +
                         "MERGE (m)-[:HAS_PARAMETER]->(p)",
                 Values.parameters("methodId", methodNodeId, "paramId", paramNodeId)
@@ -324,7 +299,7 @@ public class Neo4jService implements AutoCloseable {
     }
 
     public void linkParameterOfType(String paramNodeId, String paramTypeName) {
-        runCypherThreadsafe(
+        runCypher(
                 "MATCH (p:Parameter {id: $paramId}), (t:Type {name: $paramTypeName}) " +
                         "MERGE (p)-[:OF_TYPE]->(t)",
                 Values.parameters("paramId", paramNodeId, "paramTypeName", paramTypeName)
@@ -332,7 +307,7 @@ public class Neo4jService implements AutoCloseable {
     }
 
     public void linkParameterHasTypeArgument(String paramNodeId, String argId) {
-        runCypherThreadsafe(
+        runCypher(
                 "MATCH (p:Parameter {id: $paramId}), (arg:TypeArgument {id: $argId}) " +
                         "MERGE (p)-[:HAS_TYPE_ARGUMENT]->(arg)",
                 Values.parameters("paramId", paramNodeId, "argId", argId)
@@ -340,7 +315,7 @@ public class Neo4jService implements AutoCloseable {
     }
 
     public void linkMethodCallsMethod(String callerMethodId, String calleeMethodId) {
-        runCypherThreadsafe(
+        runCypher(
                 "MATCH (caller:Method {id: $callerId}), (callee:Method {id: $calleeId}) " +
                         "MERGE (caller)-[:CALLS]->(callee)",
                 Values.parameters("callerId", callerMethodId, "calleeId", calleeMethodId)
@@ -349,6 +324,6 @@ public class Neo4jService implements AutoCloseable {
 
     @Override
     public void close() {
-        driver.close();
+        _driver.close();
     }
 }

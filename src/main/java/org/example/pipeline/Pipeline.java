@@ -12,9 +12,9 @@ import java.util.List;
  */
 public class Pipeline<I, O> {
 
-    private final List<PipelineStep<?, ?>> steps;
+    private final List<IPipelineStep<?, ?>> steps;
 
-    private Pipeline(List<PipelineStep<?, ?>> steps) {
+    private Pipeline(List<IPipelineStep<?, ?>> steps) {
         this.steps = steps;
     }
 
@@ -25,8 +25,8 @@ public class Pipeline<I, O> {
     @SuppressWarnings("unchecked")
     public O run(I initialInput) {
         Object current = initialInput;
-        for (PipelineStep<?, ?> step : steps) {
-            PipelineStep<Object, Object> typedPipelineStep = (PipelineStep<Object, Object>) step;
+        for (IPipelineStep<?, ?> step : steps) {
+            IPipelineStep<Object, Object> typedPipelineStep = (IPipelineStep<Object, Object>) step;
             current = typedPipelineStep.process(current);
         }
         return (O) current;
@@ -35,7 +35,7 @@ public class Pipeline<I, O> {
     /**
      * Creates a builder starting with the first step (from I -> O).
      */
-    public static <I, O> Builder<I, O> start(PipelineStep<I, O> firstPipelineStep) {
+    public static <I, O> Builder<I, O> start(IPipelineStep<I, O> firstPipelineStep) {
         return new Builder<>(firstPipelineStep);
     }
 
@@ -45,12 +45,12 @@ public class Pipeline<I, O> {
      * (input -> output) type to (output -> newOutput) type.
      */
     public static class Builder<I, O> {
-        private final List<PipelineStep<?, ?>> steps = new ArrayList<>();
+        private final List<IPipelineStep<?, ?>> steps = new ArrayList<>();
 
         /**
          * The constructor accepts the first step.
          */
-        private <A extends I, B extends O> Builder(PipelineStep<A, B> firstPipelineStep) {
+        private <A extends I, B extends O> Builder(IPipelineStep<A, B> firstPipelineStep) {
             steps.add(firstPipelineStep);
         }
 
@@ -63,7 +63,7 @@ public class Pipeline<I, O> {
          * @return A new Builder from I -> N
          */
         @SuppressWarnings("unchecked")
-        public <N> Builder<I, N> then(PipelineStep<? super O, ? extends N> nextPipelineStep) {
+        public <N> Builder<I, N> then(IPipelineStep<? super O, ? extends N> nextPipelineStep) {
             steps.add(nextPipelineStep);
             // We "become" a Builder<I, N> now
             return (Builder<I, N>) this;

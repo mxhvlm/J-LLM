@@ -1,6 +1,5 @@
 package org.example.pipeline.spoon;
 
-import org.example.dbOutput.CallGraphExporter;
 import org.slf4j.Logger;
 
 public class SafeExtractor {
