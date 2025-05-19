@@ -38,19 +38,20 @@ public class JLLM implements Runnable {
         LOGGER.info("JLLM: Initializing...");
         _config = new JLLMConfig();
 
-//        _metaPipeline = Pipeline
-//                .start(new PurgeDatabaseStep())
-//                .then(new CreateIndeciesAndConstraintsStep())
-//                .then(new SpoonExtractorStep())
-//                .then(new ForumThreadsPipelinePreprocessed("1.19_candidate_posts_transformed.json"))
-//                .build();
+        _metaPipeline = Pipeline
+                .start(new PurgeDatabaseStep())
+                .then(new CreateIndeciesAndConstraintsStep())
+                .then(new SpoonExtractorStep())
+                .then(new ForumThreadsPipelinePreprocessed("1.19_candidate_posts_transformed.json"))
+                .then(new ExplanationSummaryPreprocessedPipeline())
+                .build();
 
 //        _metaPipeline = Pipe[line
 //            .start(new ExplanationSummaryPreprocessedPipeline())
 //            .build();
-        _metaPipeline = Pipeline.start(new CreateEmbeddingStep("Explanation", "text", "explanationIndex"))
-            .then(new CreateEmbeddingStep("Summary", "text", "summaryIndex"))
-            .build();
+//        _metaPipeline = Pipeline.start(new CreateEmbeddingStep("Explanation", "text", "explanationIndex"))
+//            .then(new CreateEmbeddingStep("Summary", "text", "summaryIndex"))
+//            .build();
 
         ILLMProvider llmProvider = new OpenAIProvider(readOpenAIConfig());
         LLMConfig explanationConfig = LLMConfig.Builder.defaultConfig()

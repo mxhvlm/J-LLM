@@ -26,6 +26,8 @@ public class CreateIndeciesAndConstraintsStep extends AbstractNeo4jMetaStep {
                 tempTx.run("CREATE CONSTRAINT IF NOT EXISTS FOR (meth:Method) REQUIRE meth.id IS UNIQUE");
                 tempTx.run("CREATE CONSTRAINT IF NOT EXISTS FOR (arg:TypeArgument) REQUIRE arg.id IS UNIQUE");
                 tempTx.run("CREATE CONSTRAINT IF NOT EXISTS FOR (param:Parameter) REQUIRE param.id IS UNIQUE");
+                tempTx.run("CREATE CONSTRAINT IF NOT EXISTS FOR (exp:Explanation) REQUIRE exp.id IS UNIQUE");
+                tempTx.run("CREATE CONSTRAINT IF NOT EXISTS FOR (sum:Summary) REQUIRE sum.id IS UNIQUE");
 
                 tempTx.commit();
                 LOGGER.info("Constraints and indexes created.");

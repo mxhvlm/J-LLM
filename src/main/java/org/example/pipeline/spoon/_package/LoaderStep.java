@@ -27,6 +27,7 @@ public class LoaderStep extends AbstractNeo4jLoaderStep
 
     @Override
     public TransformResult process(Stream<TransformerStep.IPackageOutput> input) {
+        _neo4jService.beginTransaction();
         try {
             input.forEach(packageOutput -> {
                 if (packageOutput instanceof TransformerStep.PackageNode pn) {

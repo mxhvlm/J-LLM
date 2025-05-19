@@ -76,7 +76,7 @@ public class SpoonExtractorStep extends AbstractNeo4jMetaStep {
         fieldPipeline.run(model);
         methodPipeline.run(model);
         staticCallGraphPipeline.run(model);
-        dynamicRTACallGraphPipeline.run(model);
+//        dynamicRTACallGraphPipeline.run(model);
 //        neo4jService.commitTransactionAndCloseSession();
 
         return neo4jService;
