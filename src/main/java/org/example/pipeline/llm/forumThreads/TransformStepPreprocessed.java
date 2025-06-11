@@ -17,7 +17,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Stream;
 
-class TransformStepPreprocessed
+public class TransformStepPreprocessed
     implements IPipelineStep<
         Stream<ProcessedForumThread>,
         Stream<TransformStep.IForumThreadOutput>> {

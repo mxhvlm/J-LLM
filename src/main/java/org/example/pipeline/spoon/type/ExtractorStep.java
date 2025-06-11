@@ -1,6 +1,6 @@
 package org.example.pipeline.spoon.type;
 
-import org.example.CodeModel;
+import org.example.codeModel.CodeModel;
 import org.example.pipeline.IPipelineStep;
 import org.slf4j.Logger;
 import spoon.reflect.declaration.CtType;

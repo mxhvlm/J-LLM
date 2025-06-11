@@ -1,8 +1,8 @@
 package org.example.pipeline.spoon;
 
-import org.example.CodeModel;
+import org.example.codeModel.CodeModel;
 import org.example.pipeline.IPipelineStep;
-import org.example.sourceImport.ModelBuilder;
+import org.example.codeModel.ModelBuilder;
 
 import java.util.List;
 

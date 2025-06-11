@@ -15,7 +15,9 @@ import java.util.stream.Stream;
 
 public class ExplanationLoadStep extends AbstractNeo4jLoaderStep
     implements IPipelineStep<Stream<ExplanationTransformStep.ILLMExplanationStepOutput>, TransformResult> {
+
   private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(ExplanationLoadStep.class);
+
   public ExplanationLoadStep(Neo4jService neo4jService) {
     super(neo4jService);
   }

@@ -16,7 +16,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-class TransformStep
+public class TransformStep
     extends AbstractLLMTransformStep<
     ProcessedForumThread,
     TransformStep.IForumThreadOutput> {

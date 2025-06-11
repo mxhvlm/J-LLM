@@ -1,6 +1,6 @@
 package org.example.pipeline.spoon._package;
 
-import org.example.CodeModel;
+import org.example.codeModel.CodeModel;
 import org.example.pipeline.IPipelineStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

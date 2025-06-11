@@ -1,16 +1,12 @@
-package org.example;
+package org.example.codeModel;
 
 import spoon.reflect.CtModel;
-import spoon.reflect.code.CtInvocation;
 import spoon.reflect.declaration.CtField;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtParameter;
 import spoon.reflect.declaration.CtType;
-import spoon.reflect.reference.CtExecutableReference;
-import spoon.reflect.visitor.filter.TypeFilter;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 import static org.example.JLLM.LOGGER;
 

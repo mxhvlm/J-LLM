@@ -1,7 +1,7 @@
 package org.example.pipeline.spoon.callGraph.dynamic;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.example.CodeModel;
+import org.example.codeModel.CodeModel;
 import org.example.pipeline.IPipelineStep;
 import spoon.reflect.code.CtConstructorCall;
 import spoon.reflect.reference.CtExecutableReference;

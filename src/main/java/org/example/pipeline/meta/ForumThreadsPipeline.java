@@ -1,4 +1,4 @@
-package org.example.pipeline.llm.forumThreads;
+package org.example.pipeline.meta;
 
 import com.google.gson.JsonParser;
 import org.example.data.knowledge.ProcessedForumThread;
@@ -9,6 +9,8 @@ import org.example.pipeline.JsonExtractorStep;
 import org.example.pipeline.Pipeline;
 import org.example.pipeline.TransformResult;
 import org.example.pipeline.llm.AbstractLLMBatchedPipelineStep;
+import org.example.pipeline.llm.forumThreads.LoadStep;
+import org.example.pipeline.llm.forumThreads.TransformStep;
 
 import java.io.FileReader;
 import java.io.IOException;

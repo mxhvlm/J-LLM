@@ -1,4 +1,4 @@
-package org.example.pipeline.llm;
+package org.example.pipeline.llm.neo4j;
 
 import org.example.dbOutput.Neo4jService;
 import org.example.pipeline.IPipelineStep;

@@ -1,4 +1,4 @@
-package org.example.pipeline.llm;
+package org.example.pipeline.llm.neo4j;
 
 import com.google.gson.Gson;
 import org.example.data.neo4j.Neo4jMethodSummaryContextResult;

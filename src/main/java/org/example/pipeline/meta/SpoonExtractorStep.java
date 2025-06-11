@@ -1,6 +1,6 @@
 package org.example.pipeline.meta;
 
-import org.example.CodeModel;
+import org.example.codeModel.CodeModel;
 import org.example.JLLMConfig;
 import org.example.dbOutput.Neo4jService;
 import org.example.pipeline.genericNeo4j.GenericLinkLoaderStep;
@@ -17,7 +17,7 @@ import org.example.pipeline.spoon.callGraph.dynamic.InstantiatedTypeExtractionSt
 import org.example.pipeline.spoon.method.LoadJsonStep;
 import org.example.pipeline.spoon.method.LoadStep;
 import org.example.pipeline.spoon.type.Transformer;
-import org.example.sourceImport.ModelBuilder;
+import org.example.codeModel.ModelBuilder;
 
 import java.util.List;
 

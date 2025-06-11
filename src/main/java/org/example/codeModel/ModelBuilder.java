@@ -1,11 +1,8 @@
-package org.example.sourceImport;
+package org.example.codeModel;
 
-import org.example.CodeModel;
 import org.slf4j.Logger;
 import spoon.Launcher;
 import spoon.SpoonAPI;
-import spoon.processing.AbstractProcessor;
-import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtParameter;
 import spoon.reflect.declaration.CtType;

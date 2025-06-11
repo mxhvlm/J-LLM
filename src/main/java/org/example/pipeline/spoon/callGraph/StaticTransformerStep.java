@@ -1,7 +1,7 @@
 package org.example.pipeline.spoon.callGraph;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.example.CodeModel;
+import org.example.codeModel.CodeModel;
 import org.example.data.neo4j.Neo4JLink;
 import org.example.pipeline.IPipelineStep;
 import org.slf4j.Logger;

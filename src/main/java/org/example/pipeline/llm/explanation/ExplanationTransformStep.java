@@ -12,11 +12,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-class ExplanationTransformStep
+public class ExplanationTransformStep
     extends AbstractLLMTransformStep<
     Neo4jMethodSummaryContextResult,
       ExplanationTransformStep.ILLMExplanationStepOutput> {
+
   private final LLMConfig _config;
+
   public ExplanationTransformStep(ILLMProvider llmProvider, LLMConfig config) {
     super(llmProvider);
     _config = config;

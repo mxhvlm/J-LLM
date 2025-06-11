@@ -1,6 +1,5 @@
-package org.example.sourceImport;
+package org.example.codeModel;
 
-import org.example.CodeModel;
 import spoon.reflect.code.CtInvocation;
 import spoon.reflect.declaration.*;
 
