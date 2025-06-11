@@ -3,7 +3,7 @@ package org.example.pipeline.meta;
 import org.example.codeModel.CodeModel;
 import org.example.JLLMConfig;
 import org.example.dbOutput.Neo4jService;
-import org.example.pipeline.genericNeo4j.GenericLinkLoaderStep;
+import org.example.pipeline.genericNeo4j.LinkLoaderStep;
 import org.example.pipeline.Pipeline;
 import org.example.pipeline.TransformResult;
 import org.example.pipeline.spoon._package.ExtractorStep;
@@ -59,7 +59,7 @@ public class SpoonExtractorStep extends AbstractNeo4jMetaStep {
         Pipeline<CodeModel, TransformResult> staticCallGraphPipeline = Pipeline
             .start(new StaticExtractorStep())
             .then(new StaticTransformerStep())
-            .then(new GenericLinkLoaderStep(neo4jService))
+            .then(new LinkLoaderStep(neo4jService))
             .build();
 
         Config dynamicCallGraphConfig = new Config(List.of("net.minecraft", "net.minecraftforge", "com.mojang"));
@@ -67,7 +67,7 @@ public class SpoonExtractorStep extends AbstractNeo4jMetaStep {
             .start(new StaticExtractorStep())
             .then(new InstantiatedTypeExtractionStep(dynamicCallGraphConfig))
             .then(new DynamicTransformerStep(dynamicCallGraphConfig))
-            .then(new GenericLinkLoaderStep(neo4jService))
+            .then(new LinkLoaderStep(neo4jService))
             .build();
 
 //        neo4jService.startSessionAndTransaction();

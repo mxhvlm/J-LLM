@@ -10,11 +10,11 @@ import org.slf4j.Logger;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class GenericLinkLoaderStep extends AbstractNeo4jLoaderStep
+public class LinkLoaderStep extends AbstractNeo4jLoaderStep
     implements IPipelineStep<Stream<Neo4JLink>, TransformResult> {
-    private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(GenericLinkLoaderStep.class);
+    private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(LinkLoaderStep.class);
 
-    public GenericLinkLoaderStep(Neo4jService neo4jService) {
+    public LinkLoaderStep(Neo4jService neo4jService) {
         super(neo4jService);
     }
 
