@@ -1,27 +1,34 @@
 package org.example.codeModel;
 
-import spoon.reflect.CtModel;
-import spoon.reflect.declaration.CtField;
-import spoon.reflect.declaration.CtMethod;
-import spoon.reflect.declaration.CtParameter;
+import org.apache.commons.lang3.NotImplementedException;
+import org.example.codeModel.wrapper.*;
 import spoon.reflect.declaration.CtType;
 
 import java.util.List;
 
 import static org.example.JLLM.LOGGER;
 
-public class CodeModel {
-    private final CtModel _model;
+/**
+ * Value Object representing a code model containing types, methods, and parameters.
+ *
+ * @Author MaxHvlm
+ */
+public class CodeModel implements ICodeModel{
     private final String _name;
 
-    private final List<CtType<?>> _allTypes;
-    private final List<CtMethod<?>> _allMethods;
-    private final List<CtParameter<?>> _allParameters;
+    private final List<IPackage> _allPackages;
+    private final List<IType> _allTypes;
+    private final List<IMethod> _allMethods;
+    private final List<IParameter> _allParameters;
+    private final List<IField> _allFields;
 
-    public CodeModel(CtModel model, String name, List<CtType<?>> allTypes, List<CtMethod<?>> allMethods, List<CtParameter<?>> allParameters) {
-        _model = model;
+    //TODO: Check what requirements we have for getting instantiated types, then store them in an appropriate datastructure.
+
+    public CodeModel(String name, List<IPackage> packages, List<IType> allTypes, List<IField> allFields, List<IMethod> allMethods, List<IParameter> allParameters) {
         _name = name;
+        _allPackages = packages;
         _allTypes = allTypes;
+        _allFields = allFields;
         _allMethods = allMethods;
         _allParameters = allParameters;
     }
@@ -35,14 +42,41 @@ public class CodeModel {
 
     public String[] getStatistics() {
         return new String[] {
-            "Number of classes: " + _model.getAllTypes().size() + " from processor: " + _allTypes.size(),
-            "Number of methods: " + _model.getElements(f -> f instanceof CtMethod<?>).size() + " from processor: " + _allMethods.size(),
-            "Number of packages: " + _model.getAllPackages().size(),
-            "Number of fields: " + _model.getElements(f -> f instanceof CtField<?>).size()
+            "Model Name: " + _name,
+            "Total Packages: " + _allPackages.size(),
+            "Total Types: " + _allTypes.size(),
+            "Total Methods: " + _allMethods.size(),
+            "Total Parameters: " + _allParameters.size()
         };
     }
 
-    public CtModel getCtModel() {
-        return _model;
+    @Override
+    public List<IPackage> getPackages() {
+        return _allPackages;
+    }
+
+    @Override
+    public List<IField> getFields() {
+        return _allFields;
+    }
+
+    @Override
+    public List<IType> getTypes() {
+        return _allTypes;
+    }
+
+    @Override
+    public List<IMethod> getMethods() {
+        return _allMethods;
+    }
+
+    @Override
+    public List<IParameter> getParameters() {
+        return _allParameters;
+    }
+
+    @Override
+    public List<IType> getInstantiatedTypes() {
+        throw new NotImplementedException("getInstantiatedTypes() is not implemented yet. Please implement this method to retrieve instantiated types from the code model.");
     }
 }

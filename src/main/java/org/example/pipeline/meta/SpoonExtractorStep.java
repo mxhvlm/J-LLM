@@ -17,7 +17,7 @@ import org.example.pipeline.spoon.callGraph.dynamic.InstantiatedTypeExtractionSt
 import org.example.pipeline.spoon.method.LoadJsonStep;
 import org.example.pipeline.spoon.method.LoadStep;
 import org.example.pipeline.spoon.type.Transformer;
-import org.example.codeModel.ModelBuilder;
+import org.example.codeModel.impl.spoon.SpoonModelBuilder;
 
 import java.util.List;
 
@@ -26,7 +26,7 @@ public class SpoonExtractorStep extends AbstractNeo4jMetaStep {
     @Override
     public Neo4jService process(Neo4jService neo4jService) {
         var config = new JLLMConfig();
-        var model = new ModelBuilder().addInputResource(config.getInputPath()).buildModel();
+        var model = new SpoonModelBuilder().addInputResource(config.getInputPath()).buildModel();
         model.printStatistics();
 
         Pipeline<CodeModel, TransformResult> packagePipeline = Pipeline

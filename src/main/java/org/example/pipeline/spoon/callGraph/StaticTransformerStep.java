@@ -25,7 +25,6 @@ public class StaticTransformerStep implements IPipelineStep<
   @Override
   public Stream<Neo4JLink> process(Pair<CodeModel, Stream<? extends CtExecutableReference<?>>> input) {
     LOGGER.info("StaticCallGraphTransformer: Linking method calls...");
-
     return input
         .getRight()
         .filter(executableRef -> {
