@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import spoon.Launcher;
 import spoon.SpoonAPI;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -63,8 +62,8 @@ public class SpoonModelBuilder implements IModelBuilder {
         throw new NotImplementedException("getParameters() is not implemented yet. Please implement this method to retrieve parameters from the Spoon model.");
     }
 
-    private List<IType> getInstanciatedTypes(SpoonAPI spoon) {
-        throw new NotImplementedException("getInstanciatedTypes() is not implemented yet. Please implement this method to retrieve instantiated types from the Spoon model.");
+    private List<IType> getInstantiatedTypes(SpoonAPI spoon) {
+        throw new NotImplementedException("getInstantiatedTypes() is not implemented yet. Please implement this method to retrieve instantiated types from the Spoon model.");
     }
 
     @Override
