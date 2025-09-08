@@ -1,6 +1,6 @@
 package org.example.pipeline.llm.neo4j;
 
-import org.example.dbOutput.Neo4jService;
+import org.example.interop.neo4j.Neo4jService;
 import org.example.pipeline.IPipelineStep;
 import org.neo4j.driver.Values;
 import org.slf4j.Logger;

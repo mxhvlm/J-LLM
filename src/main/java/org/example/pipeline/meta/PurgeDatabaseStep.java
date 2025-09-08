@@ -1,6 +1,6 @@
 package org.example.pipeline.meta;
 
-import org.example.dbOutput.Neo4jService;
+import org.example.interop.neo4j.Neo4jService;
 import org.neo4j.driver.Session;
 import org.neo4j.driver.Transaction;
 import org.slf4j.Logger;

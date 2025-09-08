@@ -1,8 +1,8 @@
 package org.example.pipeline.meta;
 
-import org.example.dbOutput.Neo4jService;
-import org.example.llm.ILLMProvider;
-import org.example.llm.LLMConfig;
+import org.example.interop.neo4j.Neo4jService;
+import org.example.interop.llm.ILLMProvider;
+import org.example.interop.llm.LLMConfig;
 import org.example.pipeline.TransformResult;
 import org.example.pipeline.llm.AbstractLLMBatchedPipelineStep;
 import org.example.pipeline.llm.explanation.ExplanationLoadStep;

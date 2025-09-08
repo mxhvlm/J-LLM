@@ -1,10 +1,10 @@
 package org.example.pipeline.llm.oneSentenceSummary;
 
-import org.example.data.neo4j.Neo4JLink;
-import org.example.data.neo4j.Neo4jMethodSummaryContextResult;
-import org.example.data.neo4j.Neo4jSummary;
-import org.example.llm.ILLMProvider;
-import org.example.llm.LLMConfig;
+import org.example.datamodel.neo4j.Neo4JLink;
+import org.example.datamodel.neo4j.Neo4jMethodSummaryContextResult;
+import org.example.datamodel.neo4j.Neo4jSummary;
+import org.example.interop.llm.ILLMProvider;
+import org.example.interop.llm.LLMConfig;
 import org.example.pipeline.llm.AbstractLLMTransformStep;
 
 import java.util.Collection;

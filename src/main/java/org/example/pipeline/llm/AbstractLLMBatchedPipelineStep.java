@@ -1,7 +1,7 @@
 package org.example.pipeline.llm;
 
-import org.example.llm.ILLMProvider;
-import org.example.llm.LLMConfig;
+import org.example.interop.llm.ILLMProvider;
+import org.example.interop.llm.LLMConfig;
 import org.example.pipeline.meta.AbstractBatchedPipelineStep;
 
 public abstract class AbstractLLMBatchedPipelineStep extends AbstractBatchedPipelineStep {

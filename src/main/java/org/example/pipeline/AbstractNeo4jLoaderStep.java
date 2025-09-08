@@ -1,6 +1,6 @@
 package org.example.pipeline;
 
-import org.example.dbOutput.Neo4jService;
+import org.example.interop.neo4j.Neo4jService;
 
 public class AbstractNeo4jLoaderStep {
 

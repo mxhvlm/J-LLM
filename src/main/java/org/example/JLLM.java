@@ -1,10 +1,10 @@
 package org.example;
 
-import org.example.dbOutput.*;
-import org.example.llm.APIConfig;
-import org.example.llm.ILLMProvider;
-import org.example.llm.LLMConfig;
-import org.example.llm.providerImpl.OpenAIProvider;
+import org.example.interop.neo4j.Neo4jService;
+import org.example.interop.llm.APIConfig;
+import org.example.interop.llm.ILLMProvider;
+import org.example.interop.llm.LLMConfig;
+import org.example.interop.llm.providerImpl.OpenAIProvider;
 import org.example.pipeline.Pipeline;
 import org.example.pipeline.llm.ExplanationSummaryPreprocessedPipeline;
 import org.example.pipeline.meta.ForumThreadsPipelinePreprocessed;
@@ -72,14 +72,13 @@ public class JLLM implements Runnable {
     @Override
     public void run() {
         LOGGER.info("JLLM: Running import...");
-        try (Neo4jService neo4jService = new Neo4jService(
+        Neo4jService neo4jService = new Neo4jService(
                 _config.getNeo4jUri(),
                 _config.getNeo4jUser(),
-                _config.getNeo4jPassword())) {
+                _config.getNeo4jPassword());
 
             _metaPipeline.run(neo4jService);
 
-            System.out.println("Modules and packages imported successfully.");
-        }
+            System.out.println("Modules and packages imported successfully. Exiting...");
     }
 }

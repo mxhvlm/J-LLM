@@ -1,10 +1,10 @@
 package org.example.pipeline.meta;
 
 import com.google.gson.JsonParser;
-import org.example.data.knowledge.ProcessedForumThread;
-import org.example.dbOutput.Neo4jService;
-import org.example.llm.ILLMProvider;
-import org.example.llm.LLMConfig;
+import org.example.datamodel.knowledge.ProcessedForumThread;
+import org.example.interop.neo4j.Neo4jService;
+import org.example.interop.llm.ILLMProvider;
+import org.example.interop.llm.LLMConfig;
 import org.example.pipeline.JsonExtractorStep;
 import org.example.pipeline.Pipeline;
 import org.example.pipeline.TransformResult;

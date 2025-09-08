@@ -1,7 +1,7 @@
 package org.example.pipeline.llm.oneSentenceSummary;
 
-import org.example.data.neo4j.Neo4jSummary;
-import org.example.dbOutput.Neo4jService;
+import org.example.datamodel.neo4j.Neo4jSummary;
+import org.example.interop.neo4j.Neo4jService;
 import org.example.pipeline.AbstractNeo4jLoaderStep;
 import org.example.pipeline.IPipelineStep;
 import org.example.pipeline.TransformResult;
