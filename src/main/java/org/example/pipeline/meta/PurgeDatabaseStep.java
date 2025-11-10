@@ -1,6 +1,6 @@
 package org.example.pipeline.meta;
 
-import org.example.interop.neo4j.Neo4jService;
+import org.example.integration.neo4j.Neo4jService;
 import org.neo4j.driver.Session;
 import org.neo4j.driver.Transaction;
 import org.slf4j.Logger;
@@ -12,11 +12,12 @@ public class PurgeDatabaseStep extends AbstractNeo4jMetaStep {
     public Neo4jService process(Neo4jService input) {
         LOGGER.info("Purging database...");
         try (Session tempSession = input.getDriver().session()) {
-            try (Transaction tempTx = tempSession.beginTransaction()) {
-                LOGGER.info("Purging contents...");
-                tempTx.run("MATCH (n) DETACH DELETE n");
-                tempTx.commit();
-            }
+            LOGGER.info("Purging contents...");
+
+            tempSession.run("MATCH (n)\n" +
+                    "CALL { WITH n\n" +
+                    "DETACH DELETE n\n" +
+                    "} IN TRANSACTIONS OF 10000 ROWS;");
         }
         try (Session tempSession = input.getDriver().session()) {
             try (Transaction tempTx = tempSession.beginTransaction()) {

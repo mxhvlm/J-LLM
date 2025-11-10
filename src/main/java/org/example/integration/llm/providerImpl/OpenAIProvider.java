@@ -1,10 +1,9 @@
-package org.example.interop.llm.providerImpl;
+package org.example.integration.llm.providerImpl;
 
-import org.example.interop.llm.APIConfig;
-import org.example.interop.llm.ILLMProvider;
-import org.example.interop.llm.ILLMResponse;
-import org.example.interop.llm.LLMConfig;
-import org.example.llm.*;
+import org.example.integration.llm.APIConfig;
+import org.example.integration.llm.ILLMProvider;
+import org.example.integration.llm.ILLMResponse;
+import org.example.integration.llm.LLMConfig;
 import com.google.gson.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

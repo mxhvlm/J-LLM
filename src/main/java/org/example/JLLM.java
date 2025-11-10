@@ -1,10 +1,10 @@
 package org.example;
 
-import org.example.interop.neo4j.Neo4jService;
-import org.example.interop.llm.APIConfig;
-import org.example.interop.llm.ILLMProvider;
-import org.example.interop.llm.LLMConfig;
-import org.example.interop.llm.providerImpl.OpenAIProvider;
+import org.example.integration.neo4j.Neo4jService;
+import org.example.integration.llm.APIConfig;
+import org.example.integration.llm.ILLMProvider;
+import org.example.integration.llm.LLMConfig;
+import org.example.integration.llm.providerImpl.OpenAIProvider;
 import org.example.pipeline.Pipeline;
 import org.example.pipeline.llm.ExplanationSummaryPreprocessedPipeline;
 import org.example.pipeline.meta.ForumThreadsPipelinePreprocessed;

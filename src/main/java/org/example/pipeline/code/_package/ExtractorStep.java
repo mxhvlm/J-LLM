@@ -1,6 +1,7 @@
 package org.example.pipeline.code._package;
 
 import org.example.datamodel.code.CodeModel;
+import org.example.datamodel.code.QualifiedName;
 import org.example.datamodel.code.wrapper.IPackage;
 import org.example.pipeline.IPipelineStep;
 import org.slf4j.Logger;
@@ -16,7 +17,8 @@ public class ExtractorStep implements IPipelineStep<CodeModel, Stream<String>> {
         return model.getPackages()
                 .stream()
                 .distinct()
-                .map(IPackage::getQualifiedName);
+                .map(IPackage::getName)
+                .map(QualifiedName::toString);
     }
 
     @Override

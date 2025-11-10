@@ -1,6 +1,6 @@
-package org.example.interop.llm.providerImpl;
+package org.example.integration.llm.providerImpl;
 
-import org.example.interop.llm.ILLMResponse;
+import org.example.integration.llm.ILLMResponse;
 
 import java.util.Optional;
 

@@ -2,7 +2,7 @@ package org.example.pipeline.code.type;
 
 import org.example.datamodel.neo4j.Neo4JLink;
 import org.example.datamodel.neo4j.Neo4jType;
-import org.example.interop.neo4j.Neo4jService;
+import org.example.integration.neo4j.Neo4jService;
 import org.example.pipeline.AbstractNeo4jLoaderStep;
 import org.example.pipeline.IPipelineStep;
 import org.example.pipeline.TransformResult;
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public class LoaderStep extends AbstractNeo4jLoaderStep
-        implements IPipelineStep<Stream<Transformer.ITypeOutput>, TransformResult> {
+        implements IPipelineStep<Stream<TransformerStep.ITypeOutput>, TransformResult> {
 
     private static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger(LoaderStep.class);
     public LoaderStep(Neo4jService neo4jService) {
@@ -41,19 +41,19 @@ public class LoaderStep extends AbstractNeo4jLoaderStep
     }
 
     @Override
-    public TransformResult process(Stream<Transformer.ITypeOutput> input) {
+    public TransformResult process(Stream<TransformerStep.ITypeOutput> input) {
 //        _neo4jService.startSessionAndTransaction();
         LOGGER.info("TypeExporter: Loading types...");
 
         _neo4jService.beginTransaction();
 
         createPrimitiveTypeNodes();
-        List<Transformer.TypeNode> nodes = new ArrayList<>();
+        List<TransformerStep.TypeNode> nodes = new ArrayList<>();
         List<Neo4JLink> links = new ArrayList<>();
         input.forEach(output -> {
-            if (output instanceof Transformer.TypeNode tn) {
+            if (output instanceof TransformerStep.TypeNode tn) {
                 nodes.add(tn);
-            } else if (output instanceof Transformer.TypeLink tl) {
+            } else if (output instanceof TransformerStep.TypeLink tl) {
                 links.add(tl.link());
             }
         });

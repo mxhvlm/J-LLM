@@ -1,5 +1,7 @@
 package org.example.pipeline.code.field;
 
+import org.example.datamodel.code.wrapper.IField;
+import org.example.datamodel.code.wrapper.IType;
 import org.example.pipeline.IPipelineStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,18 +11,18 @@ import spoon.reflect.declaration.CtType;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class ExtractorStep implements IPipelineStep<Stream<CtType<?>>, Stream<CtField<?>>> {
+public class ExtractorStep implements IPipelineStep<Stream<IType>, Stream<IField>> {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExtractorStep.class);
 
-    public Stream<CtField<?>> extractFields(Stream<CtType<?>> types) {
+    public Stream<IField> extractFields(Stream<IType> types) {
         LOGGER.info("ModelExtractor: Extracting fields...");
         return types
-            .map(CtType::getFields)
+            .map(IType::getFields)
             .flatMap(List::stream);
     }
 
     @Override
-    public Stream<CtField<?>> process(Stream<CtType<?>> input) {
+    public Stream<IField> process(Stream<IType> input) {
         return extractFields(input);
     }
 }

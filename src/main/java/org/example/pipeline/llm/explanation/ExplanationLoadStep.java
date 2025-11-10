@@ -1,7 +1,7 @@
 package org.example.pipeline.llm.explanation;
 
 import org.example.datamodel.neo4j.Neo4jExplanation;
-import org.example.interop.neo4j.Neo4jService;
+import org.example.integration.neo4j.Neo4jService;
 import org.example.pipeline.AbstractNeo4jLoaderStep;
 import org.example.pipeline.IPipelineStep;
 import org.example.pipeline.TransformResult;

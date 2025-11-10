@@ -1,8 +1,8 @@
 package org.example.pipeline.llm;
 
-import org.example.interop.llm.ILLMProvider;
-import org.example.interop.llm.ILLMResponse;
-import org.example.interop.llm.LLMConfig;
+import org.example.integration.llm.ILLMProvider;
+import org.example.integration.llm.ILLMResponse;
+import org.example.integration.llm.LLMConfig;
 import org.example.pipeline.IPipelineStep;
 import org.slf4j.Logger;
 

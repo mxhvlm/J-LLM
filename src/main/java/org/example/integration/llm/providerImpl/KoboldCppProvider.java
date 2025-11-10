@@ -1,8 +1,8 @@
-package org.example.interop.llm.providerImpl;
+package org.example.integration.llm.providerImpl;
 
-import org.example.interop.llm.ILLMProvider;
-import org.example.interop.llm.ILLMResponse;
-import org.example.interop.llm.LLMConfig;
+import org.example.integration.llm.ILLMProvider;
+import org.example.integration.llm.ILLMResponse;
+import org.example.integration.llm.LLMConfig;
 
 public class KoboldCppProvider implements ILLMProvider {
     @Override

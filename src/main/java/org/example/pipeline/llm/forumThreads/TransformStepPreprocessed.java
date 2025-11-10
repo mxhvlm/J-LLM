@@ -6,7 +6,7 @@ import org.example.datamodel.neo4j.Neo4JLink;
 import org.example.datamodel.neo4j.Neo4jForumThread;
 import org.example.datamodel.neo4j.Neo4jForumThreadTag;
 import org.example.datamodel.neo4j.Neo4jType;
-import org.example.interop.neo4j.Neo4jService;
+import org.example.integration.neo4j.Neo4jService;
 import org.example.pipeline.IPipelineStep;
 import org.neo4j.driver.Values;
 import org.neo4j.driver.types.Node;

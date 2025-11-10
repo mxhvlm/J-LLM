@@ -14,8 +14,7 @@ import java.util.stream.Stream;
 import static org.example.pipeline.code.SafeExtractor.safelyExtract;
 
 public class StaticTransformerStep implements IPipelineStep<
-    Pair<CodeModel, Stream<? extends CtExecutableReference<?>>>,
-        Stream<Neo4JLink>> {
+    Pair<CodeModel, Stream<? extends CtExecutableReference<?>>>, Stream<Neo4JLink>> {
     private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(StaticTransformerStep.class);
 
     public sealed interface IStaticCallGraphOutput permits StaticTransformerStep.StaticCall {}

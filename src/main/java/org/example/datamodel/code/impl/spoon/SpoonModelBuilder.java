@@ -3,23 +3,35 @@ package org.example.datamodel.code.impl.spoon;
 import org.apache.commons.lang3.NotImplementedException;
 import org.example.datamodel.code.CodeModel;
 import org.example.datamodel.code.IModelBuilder;
-import org.example.code.wrapper.*;
 import org.example.datamodel.code.wrapper.*;
 import org.slf4j.Logger;
 import spoon.Launcher;
 import spoon.SpoonAPI;
+import spoon.reflect.declaration.*;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class SpoonModelBuilder implements IModelBuilder {
     private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(SpoonModelBuilder.class);
+
+    private final CodeObjectRegistry _objectRegistry;
+
     private boolean _enableAutoImports = true;
     private String _modelName = "Model";
 
     public SpoonModelBuilder() {
         _inputResourcePaths = new LinkedList<>();
+        _objectRegistry = new CodeObjectRegistry();
+
+        _objectRegistry.createRegister(IPackage.class, CtPackage.class);
+        _objectRegistry.createRegister(IType.class, CtType.class);
+        _objectRegistry.createRegister(IField.class, CtField.class);
+        _objectRegistry.createRegister(IMethod.class, CtMethod.class);
+        _objectRegistry.createRegister(IParameter.class, CtParameter.class);
     }
 
     private final List<String> _inputResourcePaths;
@@ -49,41 +61,51 @@ public class SpoonModelBuilder implements IModelBuilder {
             .getAllPackages()
             .stream()
             .filter(ctPackage -> !ctPackage.isUnnamedPackage())
-            .map(WrappedCtPackage::new)
-            .collect(Collectors.toUnmodifiableList());
-    }
-
-    private List<IField> getFields(SpoonAPI spoon) {
-        return getTypes(spoon)
-                .stream()
-                .flatMap(type -> type.getFields().stream())
-                .toList();
-    }
-
-    private List<IType> getTypes(SpoonAPI spoon) {
-        return spoon.getModel()
-            .getAllTypes()
-            .stream()
-            .map(t -> new WrappedCtType(t, null)) // TODO: Think about parent types
-            .collect(Collectors.toUnmodifiableList());
-    }
-
-    private List<IMethod> getMethods(SpoonAPI spoon) {
-        return getTypes(spoon)
-            .stream()
-            .flatMap(type -> type.getMethods().stream())
+            .map(p -> _objectRegistry.getRegister(IPackage.class).getOrCreate(QualifiedNameFactory.fromCtElement(p), () -> new WrappedCtPackage(p)))
             .toList();
     }
 
-    private List<IParameter> getParameters(SpoonAPI spoon) {
-        return getMethods(spoon)
-            .stream()
-            .flatMap(method -> method.getParameters().stream())
-            .toList();
-    }
+//    private List<IField> getFields(SpoonAPI spoon) {
+//        return getTypes(spoon)
+//                .stream()
+//                .flatMap(type -> type.getFields().stream())
+//                .toList();
+//    }
+//
+//    private List<IType> getTypes(SpoonAPI spoon) {
+//        return spoon.getModel()
+//            .getAllTypes()
+//            .stream()
+//            .map(t -> _objectRegistry.getRegister(IType.class).getOrCreate(QualifiedNameFactory.fromCtElement(t), () -> new WrappedCtType(t)))
+//            .toList();
+//    }
+//
+//    private List<IMethod> getMethods(SpoonAPI spoon) {
+//        return getTypes(spoon)
+//            .stream()
+//            .flatMap(type -> type.getMethods().stream())
+//            .toList();
+//    }
+//
+//    private List<IParameter> getParameters(SpoonAPI spoon) {
+//        return getMethods(spoon)
+//            .stream()
+//            .flatMap(method -> method.getParameters().stream())
+//            .toList();
+//    }
 
     private List<IType> getInstantiatedTypes(SpoonAPI spoon) {
         throw new NotImplementedException("getInstantiatedTypes() is not implemented yet. Please implement this method to retrieve instantiated types from the Spoon model.");
+    }
+
+    private <T extends INamedElement> List<T> filterScope(List<T> objects, List<String> scopes) {
+        if (scopes == null || scopes.isEmpty()) {
+            return objects;
+        }
+
+        return objects.stream()
+                .filter(obj -> scopes.stream().anyMatch(scope -> obj.getName().getQualifiedName().startsWith(scope)))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -103,15 +125,99 @@ public class SpoonModelBuilder implements IModelBuilder {
         spoon.getEnvironment().setAutoImports(_enableAutoImports);
         LOGGER.info("Building model. Please be patient, this can take a few minutes...");
         spoon.buildModel();
+        LOGGER.info("Model built. Extracting elements...");
 
-        CodeModel codeModel = new CodeModel(_modelName, getPackages(spoon),
-            getTypes(spoon), getFields(spoon), getMethods(spoon), getParameters(spoon));
+        // All package objects are created in the register
+
+        LOGGER.info("Initially resolving packages...");
+        // Start the iterative resolution process by resolving the packages
+        getPackages(spoon)
+                .forEach(p -> p.resolve(_objectRegistry));
+
+        LOGGER.info("Iterative dependency resolution starting...");
+        int iteration = 0;
+        // TODO: If we keep iterating, we're adding more and more types, etc. from the java standard library.
+        while(_objectRegistry.getAllObjects().anyMatch(e -> !e.isResolved())) {
+            LOGGER.info("Resolution iteration: {}", iteration);
+
+            LOGGER.info("Resolving packages...");
+            _objectRegistry.getRegister(IPackage.class).getAll().stream().
+                    filter(p -> !p.isResolved())
+                    .forEach(p -> p.resolve(_objectRegistry));
+
+            LOGGER.info("Resolving types...");
+            _objectRegistry
+                    .getRegister(IType.class)
+                    .getAll()
+                    .stream()
+                    .filter(t -> !t.isResolved())
+                    .forEach(t -> t.resolve(_objectRegistry));
+
+            LOGGER.info("Resolving fields...");
+            _objectRegistry
+                    .getRegister(IField.class)
+                    .getAll()
+                    .stream()
+                    .filter(f -> !f.isResolved())
+                    .forEach(f -> f.resolve(_objectRegistry));
+
+            LOGGER.info("Resolving methods...");
+            // First resolve all the method objects
+            _objectRegistry.
+                    getRegister(IMethod.class)
+                    .getAll()
+                    .stream()
+                    .filter(m -> !m.isResolved())
+                    .forEach(m -> m.resolve(_objectRegistry));
+
+            // once that's done, resolve the calls between the methods created in the last step
+            _objectRegistry
+                    .getRegister(IMethod.class)
+                    .getAll()
+                    .stream()
+                    .filter(m -> !m.isResolved())
+                    .forEach(m -> m.resolveStaticRefs(_objectRegistry));
+
+            LOGGER.info("Resolving parameters...");
+            _objectRegistry.
+                    getRegister(IParameter.class)
+                    .getAll()
+                    .stream()
+                    .filter(p -> !p.isResolved())
+                    .forEach(p -> p.resolve(_objectRegistry));
+
+            LOGGER.info("Iteration {} complete. Unresolved objects remaining: {}",
+                    iteration,
+                    _objectRegistry.getAllObjects().filter(e -> !e.isResolved()).count());
+            LOGGER.info("Unresolved: Packages: {}, Types: {}, Fields: {}, Methods: {}, Parameters: {}",
+                    _objectRegistry.getRegister(IPackage.class).getAll().stream().filter(p -> !p.isResolved()).count(),
+                    _objectRegistry.getRegister(IType.class).getAll().stream().filter(t -> !t.isResolved()).count(),
+                    _objectRegistry.getRegister(IField.class).getAll().stream().filter(f -> !f.isResolved()).count(),
+                    _objectRegistry.getRegister(IMethod.class).getAll().stream().filter(m -> !m.isResolved()).count(),
+                    _objectRegistry.getRegister(IParameter.class).getAll().stream().filter(p -> !p.isResolved()).count()
+            );
+            iteration++;
+        }
+
+        LOGGER.info("Built wrapper model in {} iterations.", iteration);
+
+
+        var scope = List.of("net.minecraft", "com.mojang", "net.minecraftforge", "org.lwjgl");
+        //TODO: Remove the .distinct() filter as we should already get distinct objects from the register hashmaps.
+        //TODO: Find out why that's not the case
+        CodeModel codeModel = new CodeModel(
+                _modelName,
+                filterScope(_objectRegistry.getRegister(IPackage.class).getAll().stream().filter(IResolvable::isResolved).distinct().toList(), scope),
+                filterScope(_objectRegistry.getRegister(IType.class).getAll().stream().filter(IResolvable::isResolved).distinct().toList(), scope),
+                filterScope(_objectRegistry.getRegister(IField.class).getAll().stream().filter(IResolvable::isResolved).distinct().toList(), scope),
+                filterScope(_objectRegistry.getRegister(IMethod.class).getAll().stream().filter(IResolvable::isResolved).distinct().toList(), scope),
+                filterScope(_objectRegistry.getRegister(IParameter.class).getAll().stream().filter(IResolvable::isResolved).distinct().toList(), scope));
 
         codeModel.printStatistics();
         codeModel.getTypes()
                 .stream()
-                .map(IType::getQualifiedName)
-                .forEach(typeName -> LOGGER.info("Found type: " + typeName));
+                .map(IType::getName)
+                .forEach(typeName -> LOGGER.info("Found type: " + typeName.getQualifiedName()));
 
         LOGGER.info("Model built successfully.");
         return codeModel;

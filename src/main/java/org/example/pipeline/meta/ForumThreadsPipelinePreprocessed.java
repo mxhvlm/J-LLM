@@ -1,7 +1,7 @@
 package org.example.pipeline.meta;
 
 import org.example.datamodel.knowledge.ProcessedForumThread;
-import org.example.interop.neo4j.Neo4jService;
+import org.example.integration.neo4j.Neo4jService;
 import org.example.pipeline.IPipelineStep;
 import org.example.pipeline.JsonExtractorStep;
 import org.example.pipeline.Pipeline;

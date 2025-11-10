@@ -1,4 +1,4 @@
-package org.example.interop.llm;
+package org.example.integration.llm;
 
 import java.util.Optional;
 

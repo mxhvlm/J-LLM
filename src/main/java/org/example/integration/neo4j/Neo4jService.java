@@ -1,4 +1,4 @@
-package org.example.interop.neo4j;
+package org.example.integration.neo4j;
 
 import org.example.datamodel.neo4j.Neo4JLink;
 import org.neo4j.driver.*;

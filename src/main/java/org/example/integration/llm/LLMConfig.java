@@ -1,4 +1,4 @@
-package org.example.interop.llm;
+package org.example.integration.llm;
 
 public record LLMConfig(
     String model,

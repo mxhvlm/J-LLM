@@ -1,9 +1,8 @@
 package org.example.datamodel.code;
 
-import org.example.code.wrapper.*;
 import org.example.datamodel.code.wrapper.*;
 
-import java.util.List;
+import java.util.Collection;
 
 /**
  * Interface representing a parsed code model.
@@ -11,10 +10,10 @@ import java.util.List;
  * @author MaxHvlm
  */
 public interface ICodeModel {
-    List<IPackage> getPackages();
-    List<IField> getFields();
-    List<IType> getTypes();
-    List<IMethod> getMethods();
-    List<IParameter> getParameters();
-    List<IType> getInstantiatedTypes();
+    Collection<IPackage> getPackages();
+    Collection<IField> getFields();
+    Collection<IType> getTypes();
+    Collection<IMethod> getMethods();
+    Collection<IParameter> getParameters();
+    Collection<IType> getInstantiatedTypes();
 }

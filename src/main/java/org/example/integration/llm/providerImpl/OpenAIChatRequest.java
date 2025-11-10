@@ -1,32 +1,33 @@
-package org.example.interop.llm.providerImpl;
+package org.example.integration.llm.providerImpl;
 
 import com.google.gson.*;
-import org.example.interop.llm.APIConfig;
-import org.example.interop.llm.LLMConfig;
+import org.example.integration.IApiRequest;
+import org.example.integration.llm.APIConfig;
+import org.example.integration.llm.LLMConfig;
 
 import java.net.URI;
 import java.net.http.HttpRequest;
 
-class OpenAIChatRequest {
-  private final String model;
-  private final JsonArray messages;
-  private final double temperature;
-  private final double topP;
-  private final int topK;
-  private final int maxTokens;
-  private final String apiUrl;
-  private final String apiKey;
+class OpenAIChatRequest implements IApiRequest {
+  private final String _model;
+  private final JsonArray _messages;
+  private final double _temperature;
+  private final double _topP;
+  private final int _topK;
+  private final int _maxTokens;
+  private final String _apiUrl;
+  private final String _apiKey;
 
   private OpenAIChatRequest(String model, JsonArray messages, double temperature, double topP,
       int topK, int maxTokens, String apiUrl, String apiKey) {
-    this.model = model;
-    this.messages = messages;
-    this.temperature = temperature;
-    this.topP = topP;
-    this.topK = topK;
-    this.maxTokens = maxTokens;
-    this.apiUrl = apiUrl;
-    this.apiKey = apiKey;
+    this._model = model;
+    this._messages = messages;
+    this._temperature = temperature;
+    this._topP = topP;
+    this._topK = topK;
+    this._maxTokens = maxTokens;
+    this._apiUrl = apiUrl;
+    this._apiKey = apiKey;
   }
 
   public static OpenAIChatRequest from(APIConfig apiConfig, LLMConfig llmConfig, String userInput) {
@@ -50,20 +51,20 @@ class OpenAIChatRequest {
 
   public JsonObject toJson() {
     JsonObject json = new JsonObject();
-    json.addProperty("model", model);
-    json.add("messages", messages);
-    json.addProperty("temperature", temperature);
-    json.addProperty("top_p", topP);
-    json.addProperty("n", topK);
-    json.addProperty("max_tokens", maxTokens);
+    json.addProperty("model", _model);
+    json.add("messages", _messages);
+    json.addProperty("temperature", _temperature);
+    json.addProperty("top_p", _topP);
+    json.addProperty("n", _topK);
+    json.addProperty("max_tokens", _maxTokens);
     return json;
   }
 
   public HttpRequest toHttpRequest() {
     return HttpRequest.newBuilder()
-        .uri(URI.create(apiUrl))
+        .uri(URI.create(_apiUrl))
         .header("Content-Type", "application/json")
-        .header("Authorization", "Bearer " + apiKey)
+        .header("Authorization", "Bearer " + _apiKey)
         .POST(HttpRequest.BodyPublishers.ofString(toJson().toString()))
         .build();
   }

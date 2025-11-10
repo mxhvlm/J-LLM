@@ -1,18 +1,19 @@
 package org.example.pipeline.code.field;
 
+import org.example.datamodel.code.wrapper.IField;
+import org.example.datamodel.code.wrapper.INamedElement;
+import org.example.datamodel.code.wrapper.IType;
 import org.example.datamodel.neo4j.Neo4JLink;
 import org.example.datamodel.neo4j.Neo4jField;
 import org.example.pipeline.IPipelineStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import spoon.reflect.declaration.CtField;
-import spoon.reflect.reference.CtTypeReference;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class TransformerStep implements IPipelineStep<Stream<CtField<?>>, Stream<TransformerStep.IFieldTransformerOutput>> {
+public class TransformerStep implements IPipelineStep<Stream<IField>, Stream<TransformerStep.IFieldTransformerOutput>> {
     private static final Logger LOGGER = LoggerFactory.getLogger(TransformerStep.class);
 
     public sealed interface IFieldTransformerOutput permits TransformerStep.FieldNode, TransformerStep.FieldLink {}
@@ -21,11 +22,12 @@ public class TransformerStep implements IPipelineStep<Stream<CtField<?>>, Stream
 
     public record FieldLink(Neo4JLink link) implements IFieldTransformerOutput {}
 
-    private Stream<Neo4jField> createFieldNodes(Stream<CtField<?>> fields) {
+    private Stream<Neo4jField> createFieldNodes(Stream<IField> fields) {
         return fields.map(ctField -> {
-            String declaringTypeName = ctField.getDeclaringType().getQualifiedName();
+            INamedElement declType = ctField.getParent().get();
+            String declaringTypeName = declType.getName().getQualifiedName();
 
-            String fieldName = ctField.getSimpleName();
+            String fieldName = ctField.getName().getSimpleName();
             String modifiers = ctField.getModifiers().toString();
             String fieldSourceSnippet = ctField.toString(); // or a more refined snippet
 
@@ -34,15 +36,13 @@ public class TransformerStep implements IPipelineStep<Stream<CtField<?>>, Stream
         });
     }
 
-    private Stream<Neo4JLink> linkFieldToDeclaringType(Stream<CtField<?>> fields) {
-        return fields.map(ctField -> {
-            String declaringTypeName = ctField.getDeclaringType().getQualifiedName();
-            String fieldName = ctField.getSimpleName();
-            CtTypeReference<?> fieldTypeRef = ctField.getType();
+    private Stream<Neo4JLink> linkFieldToDeclaringType(Stream<IField> fields) {
+        return fields.map(field -> {
+            INamedElement declType = field.getParent().get();
+            String declaringTypeName = declType.getName().getQualifiedName();
+            String fieldName = field.getName().getSimpleName();
 
             // Resolve the field's type name
-            String fieldTypeName = fieldTypeRef.getQualifiedName();
-            LOGGER.trace("Linking field " + declaringTypeName + "." + fieldName + " to type " + fieldTypeName);
             return Neo4JLink.Builder.create()
                     .withLabel("HAS_FIELD")
                     .parentLabel("Type")
@@ -55,23 +55,25 @@ public class TransformerStep implements IPipelineStep<Stream<CtField<?>>, Stream
         });
     }
 
-    private Stream<Neo4JLink> linkFieldTypes(Stream<CtField<?>> fields) {
+    private Stream<Neo4JLink> linkFieldTypes(Stream<IField> fields) {
         return fields
-            .filter(ctField -> ctField.getType() != null)
-            .flatMap(ctField -> {
-                String declaringTypeName = ctField.getDeclaringType().getQualifiedName();
-                String fieldName = ctField.getSimpleName();
-                CtTypeReference<?> fieldTypeRef = ctField.getType();
+            .filter(f -> f.getType().isPresent())
+            .filter(f -> f.getParent().isPresent())
+            .flatMap(f -> {
+                INamedElement declType = f.getParent().get();
+                String declaringTypeName = declType.getName().getQualifiedName();
+                String fieldName = declType.getName().getSimpleName();
+                IType fieldTypeRef = f.getType().get();
 
                 return linkFieldType(declaringTypeName, fieldName, fieldTypeRef);
             });
     }
 
-    private Stream<Neo4JLink> linkFieldType(String declaringTypeName, String fieldName, CtTypeReference<?> fieldTypeRef) {
+    private Stream<Neo4JLink> linkFieldType(String declaringTypeName, String fieldName, IType fieldTypeRef) {
         List<Neo4JLink> links = new LinkedList<>();
 
         // Resolve the field's type name
-        String fieldTypeName = fieldTypeRef.getQualifiedName();
+        String fieldTypeName = fieldTypeRef.getName().getQualifiedName();
         LOGGER.trace("Linking field " + declaringTypeName + "." + fieldName + " to type " + fieldTypeName);
         links.add(Neo4JLink.Builder.create()
                 .withLabel("OF_TYPE")
@@ -102,7 +104,7 @@ public class TransformerStep implements IPipelineStep<Stream<CtField<?>>, Stream
 
 
     @Override
-    public Stream<IFieldTransformerOutput> process(Stream<CtField<?>> input) {
+    public Stream<IFieldTransformerOutput> process(Stream<IField> input) {
         LOGGER.info("FieldExporter: Processing fields...");
         Stream.Builder<IFieldTransformerOutput> builder = Stream.builder();
         input.forEach(field -> {

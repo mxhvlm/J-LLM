@@ -1,37 +1,26 @@
 package org.example.datamodel.code.wrapper;
 
-import java.util.List;
+import org.example.datamodel.code.QualifiedName;
+
+import java.util.Optional;
 
 /**
  * Base class for all elements withing a code model.
  */
-public interface INamedElement {
-    /**
-     * Get the name of the element.
-     * @return the name of the element
-     */
-    String getName();
-
+public interface INamedElement extends IResolvable {
     /**
      * Get the qualified name of the element, which includes all the details fully qualifying the element's name.
      * @ensures The qualified name is unique within the context of the code model.
      * @return the qualified name of the element
      */
-    String getQualifiedName();
+    QualifiedName getName();
 
     /**
-     * Get the parts of the qualified name as a stream.
-     * This can be useful for iterating over the components of the qualified name.
-     * This includes split characters like '.' or '$' that are used to separate the parts of the qualified name.
-     * @ensures The concatenation of the parts will be unique within the context of the code model.
-     * @return a stream of strings representing the parts of the qualified name
+     * Get the parent element in the code model hierarchy.
+     * @return The parent element, or an empty Optional if there is no parent.
+     * This can be the case for the top-level element or anonymous elements.
      */
-    List<String> getQualifiedNameParts();
+    Optional<INamedElement> getParent();
 
-    /**
-     * Get the separator character used in the qualified name.
-     * This is typically a '.' for package names or a '$' for inner classes or "#" for type members.
-     * @return the separator character used in the qualified name
-     */
-    char getSeparator();
+
 }

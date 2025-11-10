@@ -1,50 +1,51 @@
 package org.example.datamodel.code.impl.spoon;
 
+import org.example.datamodel.code.wrapper.AbstractWrappedElement;
+import org.example.datamodel.code.wrapper.CodeObjectRegistry;
 import org.example.datamodel.code.wrapper.IField;
 import org.example.datamodel.code.wrapper.IType;
+import org.neo4j.driver.internal.shaded.reactor.util.annotation.Nullable;
 import spoon.reflect.declaration.CtField;
 
 import java.util.List;
+import java.util.Optional;
 
-public class WrappedCtField implements IField {
-    private final CtField<?> _field;
-    private final IType _parent;
-
-    public static final char QUALIFIED_NAME_SEPARATOR = '#';
+public class WrappedCtField extends AbstractWrappedElement<CtField<?>> implements IField {
+    private @Nullable IType _type;
 
     public WrappedCtField(CtField<?> field, IType parent) {
-        this._field = field;
+        super(field, QualifiedNameFactory.fromCtElement(field));
         this._parent = parent;
     }
 
     @Override
     public List<String> getModifiers() {
-        return _field.getModifiers()
+        return getWrappedObject().getModifiers()
                 .stream()
                 .map(Enum::name)
                 .toList();
     }
 
     @Override
-    public String getName() {
-        return _field.getSimpleName();
+    public Optional<IType> getType() {
+        return Optional.ofNullable(_type);
     }
 
     @Override
-    public String getQualifiedName() {
-        return _parent.getQualifiedName() + QUALIFIED_NAME_SEPARATOR + _field.getSimpleName();
+    public Optional<IType> getDeclaringType() {
+        return Optional.ofNullable(_parent)
+                .filter(p -> p instanceof IType)
+                .map(p -> (IType) p);
     }
 
     @Override
-    public List<String> getQualifiedNameParts() {
-        List<String> parts = _parent.getQualifiedNameParts();
-        parts.add("" + QUALIFIED_NAME_SEPARATOR);
-        parts.add(_field.getSimpleName());
-        return parts;
-    }
+    public void resolve(CodeObjectRegistry registry) {
+        super.resolve(registry);
 
-    @Override
-    public char getSeparator() {
-        return QUALIFIED_NAME_SEPARATOR;
+        if (getWrappedObject().getType().getTypeDeclaration() != null) {
+            _type = registry.getRegister(IType.class).getOrCreate(
+                    QualifiedNameFactory.fromCtElement(getWrappedObject().getType().getTypeDeclaration()),
+                    () -> new WrappedCtType(getWrappedObject().getType().getTypeDeclaration()));
+        }
     }
 }

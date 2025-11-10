@@ -1,53 +1,35 @@
 package org.example.datamodel.code.impl.spoon;
 
+import org.example.datamodel.code.wrapper.AbstractWrappedPackage;
+import org.example.datamodel.code.wrapper.CodeObjectRegistry;
 import org.example.datamodel.code.wrapper.IPackage;
 import org.example.datamodel.code.wrapper.IType;
 import spoon.reflect.declaration.CtPackage;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class WrappedCtPackage implements IPackage {
-    private final CtPackage _package;
+public class WrappedCtPackage extends AbstractWrappedPackage<CtPackage> implements IPackage {
 
-    public WrappedCtPackage(CtPackage _package) {
-        this._package = _package;
+    public WrappedCtPackage(CtPackage pkg) {
+        super(pkg, QualifiedNameFactory.fromCtElement(pkg));
     }
 
     @Override
-    public List<IType> getTypes() {
-        return _package.getTypes()
+    protected List<IType> resolveSubTypes(CodeObjectRegistry registry) {
+        return getWrappedObject().getTypes()
                 .stream()
-                .map(t -> new WrappedCtType(t, this))
-                .collect(Collectors.toUnmodifiableList());
+                .map(type -> registry.getRegister(IType.class).getOrCreate(
+                        QualifiedNameFactory.fromCtElement(type),
+                        () -> new WrappedCtType(type)))
+                .toList();
     }
 
     @Override
-    public List<IPackage> getSubPackages() {
-        return _package.getPackages()
+    protected List<IPackage> resolveSubPackages(CodeObjectRegistry registry) {
+        return getWrappedObject().getPackages()
                 .stream()
-                .map(WrappedCtPackage::new)
-                .collect(Collectors.toUnmodifiableList());
-    }
-
-    @Override
-    public String getName() {
-        return _package.getSimpleName();
-    }
-
-    @Override
-    public String getQualifiedName() {
-        return _package.getQualifiedName();
-    }
-
-    @Override
-    public List<String> getQualifiedNameParts() {
-        return Arrays.stream(_package.getQualifiedName().split("\\.")).toList();
-    }
-
-    @Override
-    public char getSeparator() {
-        return '.';
+                .map(subPkg -> registry.getRegister(IPackage.class).getOrCreate(
+                        QualifiedNameFactory.fromCtElement(subPkg), () -> new WrappedCtPackage(subPkg)))
+                .toList();
     }
 }

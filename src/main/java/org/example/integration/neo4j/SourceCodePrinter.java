@@ -1,4 +1,4 @@
-package org.example.interop.neo4j;
+package org.example.integration.neo4j;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

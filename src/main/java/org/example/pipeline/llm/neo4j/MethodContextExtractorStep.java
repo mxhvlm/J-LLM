@@ -2,7 +2,7 @@ package org.example.pipeline.llm.neo4j;
 
 import com.google.gson.Gson;
 import org.example.datamodel.neo4j.Neo4jMethodSummaryContextResult;
-import org.example.interop.neo4j.Neo4jService;
+import org.example.integration.neo4j.Neo4jService;
 import org.example.pipeline.IPipelineStep;
 import org.neo4j.driver.Values;
 import org.slf4j.Logger;

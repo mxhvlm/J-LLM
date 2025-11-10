@@ -1,64 +1,50 @@
 package org.example.datamodel.code;
 
-import org.neo4j.driver.internal.shaded.reactor.util.annotation.Nullable;
-
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
-public class QualifiedName {
+public final class QualifiedName {
+    private final List<Part> _parts;
+    private final String _cachedQualifiedName;
+    private final String _cachedSimpleName;
+    private final int _cachedHash; // cache since String#hashCode may be called often
 
-    private final List<String> _parts;
-    private final List<Character> _separators;
-    private final String _precompName;
+    public QualifiedName(List<Part> parts) {
+        _parts = Collections.unmodifiableList(parts);
 
-    public static QualifiedName of(String name, Character separator) {
-        return new QualifiedName(null, name, separator);
-    }
-
-    public QualifiedName append(String name, Character separator) {
-        return new QualifiedName(this, name, separator);
-    }
-
-    private QualifiedName(@Nullable QualifiedName parentName, String name, Character separator) {
-        if (parentName == null) {
-            _parts = List.of(name);
-            _separators = List.of();
-        } else {
-            _parts = List.copyOf(parentName._parts);
-            _parts.add(name);
-
-            _separators = List.copyOf(parentName._separators);
-            _separators.add(separator);
-        }
-
-        _precompName = buildQualifiedName();
-    }
-
-    private String buildQualifiedName() {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < _parts.size(); i++) {
-            if (i > 0) {
-                sb.append(_separators.get(i - 1));
+        for (Part part : _parts) {
+            if (!sb.isEmpty()) {
+                sb.append(part.separator().toChar());
             }
-            sb.append(_parts.get(i));
+            sb.append(part.name());
         }
-        return sb.toString();
+        _cachedQualifiedName = sb.toString();
+        _cachedSimpleName = _parts.isEmpty() ? null : _parts.get(_parts.size() - 1).name();
+        _cachedHash = _cachedQualifiedName.hashCode();
     }
 
-    public String getSimpleName() {
-        return _parts.get(_parts.size() - 1);
-    }
+    @Override public String toString() { return _cachedQualifiedName; }
 
-    @Override
-    public String toString() {
-        return _precompName;
-    }
+    @Override public int hashCode() { return _cachedHash; }
 
     @Override
-    public int hashCode() {
-        return _precompName.hashCode();
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || obj.getClass() != getClass()) return false;
+        QualifiedName other = (QualifiedName) obj;
+        return _cachedQualifiedName.equals(other._cachedQualifiedName);
     }
 
-    public List<String> parts() {
-        return _parts;
+    public List<Part> getParts() { return _parts; }
+    public String getQualifiedName() { return _cachedQualifiedName; }
+    public String getSimpleName() { return _cachedSimpleName; }
+
+    public record Part(String name, EnumQualifiedNameSeparator separator) {
+        public Part {
+            Objects.requireNonNull(name, "name");
+            Objects.requireNonNull(separator, "separator");
+        }
     }
 }

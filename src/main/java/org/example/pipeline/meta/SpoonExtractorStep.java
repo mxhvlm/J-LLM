@@ -2,7 +2,7 @@ package org.example.pipeline.meta;
 
 import org.example.datamodel.code.CodeModel;
 import org.example.JLLMConfig;
-import org.example.interop.neo4j.Neo4jService;
+import org.example.integration.neo4j.Neo4jService;
 import org.example.pipeline.Pipeline;
 import org.example.pipeline.TransformResult;
 import org.example.pipeline.code._package.ExtractorStep;
@@ -24,18 +24,26 @@ public class SpoonExtractorStep extends AbstractNeo4jMetaStep {
             .then(new LoaderStep(neo4jService))
             .build();
 
-//        Pipeline<CodeModel, TransformResult> typePipeline = Pipeline
-//            .start(new org.example.pipeline.spoon.type.ExtractorStep())
-//            .then(new Transformer())
-//            .then(new org.example.pipeline.spoon.type.LoaderStep(neo4jService))
-//            .build();
-//
-//        Pipeline<CodeModel, TransformResult> fieldPipeline = Pipeline
-//            .start(new org.example.pipeline.spoon.type.ExtractorStep())
-//            .then(new org.example.pipeline.spoon.field.ExtractorStep())
-//            .then(new org.example.pipeline.spoon.field.TransformerStep())
-//            .then(new org.example.pipeline.spoon.field.LoaderStep(neo4jService))
-//            .build();
+        Pipeline<CodeModel, TransformResult> typePipeline = Pipeline
+            .start(new org.example.pipeline.code.type.ExtractorStep())
+            .then(new org.example.pipeline.code.type.TransformerStep())
+            .then(new org.example.pipeline.code.type.LoaderStep(neo4jService))
+            .build();
+
+
+        Pipeline<CodeModel, TransformResult> fieldPipeline = Pipeline
+            .start(new org.example.pipeline.code.type.ExtractorStep())
+            .then(new org.example.pipeline.code.field.ExtractorStep())
+            .then(new org.example.pipeline.code.field.TransformerStep())
+            .then(new org.example.pipeline.code.field.LoaderStep(neo4jService))
+            .build();
+
+        Pipeline<CodeModel, TransformResult> methodPipeline = Pipeline
+            .start(new org.example.pipeline.code.type.ExtractorStep())
+            .then(new org.example.pipeline.code.method.ExtractorStep())
+            .then(new org.example.pipeline.code.method.TransformerStep())
+            .then(new org.example.pipeline.code.method.LoadStep(neo4jService))
+            .build();
 //
 //        Pipeline<CodeModel, TransformResult> methodPipeline = Pipeline
 //            .start(new org.example.pipeline.spoon.type.ExtractorStep())
@@ -62,8 +70,9 @@ public class SpoonExtractorStep extends AbstractNeo4jMetaStep {
 
 //        neo4jService.startSessionAndTransaction();
         packagePipeline.run(model);
-//        typePipeline.run(model);
-//        fieldPipeline.run(model);
+        typePipeline.run(model);
+        fieldPipeline.run(model);
+        methodPipeline.run(model);
 //        methodPipeline.run(model);
 //        staticCallGraphPipeline.run(model);
 //        dynamicRTACallGraphPipeline.run(model);
