@@ -3,12 +3,16 @@ package org.example.integration.projectmanagement.providerImpl;
 import com.google.gson.JsonObject;
 import org.apache.commons.lang3.NotImplementedException;
 import org.example.integration.IApiRequest;
+import org.example.integration.IApiResponse;
 
+import java.net.URI;
+import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 
 public class JiraAPISearchIssueRequest implements IApiRequest {
     private final String _jqlQuery;
     private final JiraApiConfig _apiConfig;
+    private final String _endpoint = "/rest/api/2/search";
 
     private JiraAPISearchIssueRequest(JiraApiConfig apiConfig, String jqlQuery) {
         _apiConfig  = apiConfig;
@@ -20,11 +24,12 @@ public class JiraAPISearchIssueRequest implements IApiRequest {
     }
 
     @Override
-    public JsonObject toJson() {
-        throw new NotImplementedException();
+    public <U> IApiResponse<U> getResponse(HttpClient httpClient, Class<U> clazz) {
+        throw new NotImplementedException("Not implemented yet");
     }
 
-    public HttpRequest toHttpRequest() {
-        throw new NotImplementedException();
+    @Override
+    public URI getUri() {
+        throw new NotImplementedException("Not implemented yet");
     }
 }
