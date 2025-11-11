@@ -1,7 +1,7 @@
 package org.example.pipeline.llm;
 
 import org.example.integration.llm.ILLMProvider;
-import org.example.integration.llm.ILLMResponse;
+import org.example.integration.IApiResponse;
 import org.example.integration.llm.LLMConfig;
 import org.example.pipeline.IPipelineStep;
 import org.slf4j.Logger;
@@ -45,7 +45,7 @@ public abstract class AbstractLLMTransformStep<T, U> implements IPipelineStep<St
     public abstract Collection<U> processLLMResult(T input, String resp);
 
     private Collection<U> processSingle(T input) {
-        ILLMResponse resp = _llmProvider.getLLMResponse(getLLMConfig(input), getLLMQuery(input));
+        IApiResponse<String> resp = _llmProvider.getLLMResponse(getLLMConfig(input), getLLMQuery(input));
         if (resp.isSuccess()) {
             LOGGER.info("LLM request succeeded: " + resp.getResponse().get());
             return processLLMResult(input, resp.getResponse().get());

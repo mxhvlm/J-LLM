@@ -1,12 +1,17 @@
 package org.example.integration.llm.providerImpl;
 
 import com.google.gson.*;
+import org.apache.commons.lang3.NotImplementedException;
+import org.example.integration.ApiResponse;
 import org.example.integration.IApiRequest;
+import org.example.integration.IApiResponse;
 import org.example.integration.llm.APIConfig;
 import org.example.integration.llm.LLMConfig;
 
 import java.net.URI;
+import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 
 class OpenAIChatRequest implements IApiRequest {
   private final String _model;
@@ -17,17 +22,19 @@ class OpenAIChatRequest implements IApiRequest {
   private final int _maxTokens;
   private final String _apiUrl;
   private final String _apiKey;
+  private final Gson _gson;
 
   private OpenAIChatRequest(String model, JsonArray messages, double temperature, double topP,
       int topK, int maxTokens, String apiUrl, String apiKey) {
-    this._model = model;
-    this._messages = messages;
-    this._temperature = temperature;
-    this._topP = topP;
-    this._topK = topK;
-    this._maxTokens = maxTokens;
-    this._apiUrl = apiUrl;
-    this._apiKey = apiKey;
+    _model = model;
+    _messages = messages;
+    _temperature = temperature;
+    _topP = topP;
+    _topK = topK;
+    _maxTokens = maxTokens;
+    _apiUrl = apiUrl;
+    _apiKey = apiKey;
+    _gson = new Gson();
   }
 
   public static OpenAIChatRequest from(APIConfig apiConfig, LLMConfig llmConfig, String userInput) {
@@ -49,7 +56,7 @@ class OpenAIChatRequest implements IApiRequest {
     );
   }
 
-  public JsonObject toJson() {
+  private JsonObject toJson() {
     JsonObject json = new JsonObject();
     json.addProperty("model", _model);
     json.add("messages", _messages);
@@ -60,12 +67,34 @@ class OpenAIChatRequest implements IApiRequest {
     return json;
   }
 
-  public HttpRequest toHttpRequest() {
+  private HttpRequest toHttpRequest() {
     return HttpRequest.newBuilder()
         .uri(URI.create(_apiUrl))
         .header("Content-Type", "application/json")
         .header("Authorization", "Bearer " + _apiKey)
         .POST(HttpRequest.BodyPublishers.ofString(toJson().toString()))
         .build();
+  }
+
+  @Override
+  public <U> IApiResponse<U> getResponse(HttpClient httpClient, Class<U> clazz) {
+    try {
+//      LOGGER.info("OpenAIProvider: Sending request to OpenAI API: {}", httpRequest.uri());
+//      LOGGER.info("OpenAIProvider: Request body: {}", request.toJson());
+      HttpResponse<String> response = httpClient.send(toHttpRequest(), HttpResponse.BodyHandlers.ofString());
+
+      if (response.statusCode() != 200) {
+        return ApiResponse.failure("OpenAI API error: " + response.statusCode() + " - " + response.body());
+      }
+
+      return ApiResponse.success(_gson.fromJson(response.body(), clazz));
+    } catch (Exception e) {
+      return ApiResponse.failure("Exception calling OpenAI API: " + e.getMessage());
+    }
+  }
+
+  @Override
+  public URI getUri() {
+    return URI.create(_apiUrl);
   }
 }

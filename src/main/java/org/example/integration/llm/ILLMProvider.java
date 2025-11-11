@@ -1,6 +1,8 @@
 package org.example.integration.llm;
 
+import org.example.integration.IApiResponse;
+
 public interface ILLMProvider {
 
-    ILLMResponse getLLMResponse(LLMConfig config, String input);
+    IApiResponse<String> getLLMResponse(LLMConfig config, String input);
 }

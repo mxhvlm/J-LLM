@@ -1,12 +1,13 @@
 package org.example.integration.llm.providerImpl;
 
+import org.example.integration.ApiResponse;
 import org.example.integration.llm.ILLMProvider;
-import org.example.integration.llm.ILLMResponse;
+import org.example.integration.IApiResponse;
 import org.example.integration.llm.LLMConfig;
 
 public class KoboldCppProvider implements ILLMProvider {
     @Override
-    public ILLMResponse getLLMResponse(LLMConfig config, String input) {
-        return LLMResponse.failure("KoboldCppProvider not implemented");
+    public IApiResponse getLLMResponse(LLMConfig config, String input) {
+        return ApiResponse.failure("KoboldCppProvider not implemented");
     }
 }
