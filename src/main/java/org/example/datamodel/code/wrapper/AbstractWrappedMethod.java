@@ -13,7 +13,6 @@ public abstract class AbstractWrappedMethod<T> extends AbstractWrappedElement<T>
     protected final List<IType> _exceptions;
     protected final List<IMethod> _referencedMethods;
     protected final List<IField> _referencedFields;
-    protected @Nullable IMethod _superMethod;
     protected @Nullable IType _returnType;
     protected String _signature;
     protected String _methodBody;
