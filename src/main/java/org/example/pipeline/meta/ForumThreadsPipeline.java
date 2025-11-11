@@ -39,7 +39,7 @@ public class ForumThreadsPipeline extends AbstractLLMBatchedPipelineStep {
   protected Pipeline<Integer, TransformResult> getPipeline(Neo4jService neo4jService) {
     return Pipeline
         .start(new JsonExtractorStep<>(ProcessedForumThread.class, _filePath, _currCursor, _batchSize))
-        .then(new TransformStep(_llmProvider, _config, neo4jService))
+        .then(new TransformStep(_llmProvider, _llmConfig, neo4jService))
         .then(new LoadStep(neo4jService))
         .then(input -> {
           _currCursor += _batchSize;

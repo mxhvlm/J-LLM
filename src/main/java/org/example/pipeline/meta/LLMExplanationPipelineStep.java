@@ -32,7 +32,7 @@ public class LLMExplanationPipelineStep extends AbstractLLMBatchedPipelineStep {
   protected Pipeline<Integer, TransformResult> getPipeline(Neo4jService neo4jService) {
     return  Pipeline
         .start(new MethodContextExtractorStep(neo4jService))
-        .then(new ExplanationTransformStep(_llmProvider, _config))
+        .then(new ExplanationTransformStep(_llmProvider, _llmConfig))
         .then(new ExplanationLoadStep(neo4jService))
         .build();
   }

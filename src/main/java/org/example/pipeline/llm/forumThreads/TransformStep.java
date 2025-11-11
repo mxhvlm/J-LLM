@@ -21,7 +21,6 @@ public class TransformStep
     ProcessedForumThread,
     TransformStep.IForumThreadOutput> {
   private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(TransformStep.class);
-  private final LLMConfig _config;
   private final Gson _gson;
   private final Neo4jService _neo4jService;
   private final String _llmPrompt = """
@@ -52,8 +51,7 @@ Output JSON (nothing else):
 """;
 
   public TransformStep(ILLMProvider llmProvider, LLMConfig config, Neo4jService neo4jService) {
-    super(llmProvider);
-    _config = config;
+    super(llmProvider, config);
     _gson = new Gson();
     _neo4jService = neo4jService;
   }

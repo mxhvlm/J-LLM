@@ -1,0 +1,29 @@
+package org.example.pipeline.llm.wiki;
+
+import org.example.integration.llm.ILLMProvider;
+import org.example.integration.llm.LLMConfig;
+import org.example.pipeline.llm.AbstractLLMTransformStep;
+
+import java.util.Collection;
+import java.util.List;
+
+public class TransformStep extends AbstractLLMTransformStep<String, String> {
+    public TransformStep(ILLMProvider llmProvider, LLMConfig config) {
+        super(llmProvider, config);
+    }
+
+    @Override
+    public String getLLMQuery(String input) {
+        return "";
+    }
+
+    @Override
+    public LLMConfig getLLMConfig(String input) {
+        return _config;
+    }
+
+    @Override
+    public Collection<String> processLLMResult(String input, String resp) {
+        return List.of();
+    }
+}

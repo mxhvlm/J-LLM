@@ -12,10 +12,12 @@ import java.util.stream.Stream;
 
 public abstract class AbstractLLMTransformStep<T, U> implements IPipelineStep<Stream<T>, Stream<U>> {
     private final ILLMProvider _llmProvider;
+    protected final LLMConfig _config;
     private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(AbstractLLMTransformStep.class);
 
-    public AbstractLLMTransformStep(ILLMProvider llmProvider) {
+    public AbstractLLMTransformStep(ILLMProvider llmProvider, LLMConfig config) {
         _llmProvider = llmProvider;
+        _config = config;
     }
 
     /**
