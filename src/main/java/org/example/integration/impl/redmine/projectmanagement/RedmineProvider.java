@@ -63,20 +63,20 @@ public class RedmineProvider implements IProjectManagementProvider {
     }
 
     /**
-     * Fetch tickets based on a query string.
-     * @param query The query string to filter tickets within the project management system.
-     *              Within Redmine, there is no jql-like query language, instead filtering is done through query params.
-     *              Example: GET /issues.xml
-     *                  GET /issues.xml?issue_id=1
-     *                  GET /issues.xml?issue_id=1,2
-     *                  GET /issues.xml?project_id=2
-     *                  GET /issues.xml?project_id=2&tracker_id=1
-     *                  GET /issues.xml?assigned_to_id=6
-     *                  GET /issues.xml?assigned_to_id=me
-     *                  GET /issues.xml?status_id=closed
-     *                  GET /issues.xml?status_id=*
-     *                  GET /issues.xml?cf_1=abcdef
-     *                  GET /issues.xml?sort=category:desc,updated_on
+     * Fetch tickets based on a query string.</br>
+     * @param query The query string to filter tickets within the project management system.</br>
+     *              Within Redmine, there is no jql-like query language, instead filtering is done through query params.</br>
+     *              Example: GET /issues.xml</br>
+     *                  GET /issues.xml?issue_id=1</br>
+     *                  GET /issues.xml?issue_id=1,2</br>
+     *                  GET /issues.xml?project_id=2</br>
+     *                  GET /issues.xml?project_id=2&tracker_id=1</br>
+     *                  GET /issues.xml?assigned_to_id=6</br>
+     *                  GET /issues.xml?assigned_to_id=me</br>
+     *                  GET /issues.xml?status_id=closed</br>
+     *                  GET /issues.xml?status_id=*</br>
+     *                  GET /issues.xml?cf_1=abcdef</br>
+     *                  GET /issues.xml?sort=category:desc,updated_on</br>
      *              Therefore, this method expects a String of query parameters to be appended to the /issues endpoint.
      * @return A response containing a list of tickets matching the query.
      */
