@@ -1,7 +1,7 @@
 package org.example.pipeline.llm.wiki;
 
-import org.example.integration.llm.ILLMProvider;
-import org.example.integration.llm.LLMConfig;
+import org.example.integration.api.llm.ILLMProvider;
+import org.example.integration.api.llm.LLMConfig;
 import org.example.pipeline.llm.AbstractLLMTransformStep;
 
 import java.util.Collection;

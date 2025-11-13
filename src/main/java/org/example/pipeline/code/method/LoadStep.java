@@ -2,7 +2,7 @@ package org.example.pipeline.code.method;
 
 import org.example.datamodel.neo4j.Neo4jMethod;
 import org.example.datamodel.neo4j.Neo4jParam;
-import org.example.integration.neo4j.Neo4jService;
+import org.example.integration.api.neo4j.INeo4jProvider;
 import org.example.pipeline.AbstractNeo4jLoaderStep;
 import org.example.pipeline.IPipelineStep;
 import org.example.pipeline.TransformResult;
@@ -18,14 +18,14 @@ public class LoadStep extends AbstractNeo4jLoaderStep
     implements IPipelineStep<Stream<TransformerStep.IMethodTransformerOutput>, TransformResult> {
 
     private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(LoadStep.class);
-    public LoadStep(Neo4jService neo4jService) {
-        super(neo4jService);
+    public LoadStep(INeo4jProvider neo4JProvider) {
+        super(neo4JProvider);
     }
 
     private void createMethodNode(Neo4jMethod method) {
         String methodNodeId = method.declaringTypeName() + "#" + method.methodSignature();
 
-        _neo4jService.runCypher("MERGE (m:Method {id: $methodId}) " +
+        _neo4JProvider.runCypher("MERGE (m:Method {id: $methodId}) " +
                 "SET m.declaringType = $declaringType, m.name = $name, m.signature = $signature, " +
                 "    m.modifiers = $modifiers, m.sourceCode = $sourceCode, m.javadoc = $javadoc",
             Values.parameters(
@@ -40,7 +40,7 @@ public class LoadStep extends AbstractNeo4jLoaderStep
     }
 
     private void createParameterNode(Neo4jParam param) {
-        _neo4jService.runCypher(
+        _neo4JProvider.runCypher(
             "MERGE (p:Parameter {id: $paramId}) " +
                 "SET p.name = $paramName, " + // Ensure "name" is set
                 "    p.displayName = $paramName",  // Optionally add displayName for clarity
@@ -53,7 +53,7 @@ public class LoadStep extends AbstractNeo4jLoaderStep
         Stream<TransformerStep.IMethodTransformerOutput> input) {
         LOGGER.info("MethodExporter: Loading methods...");
 
-        _neo4jService.beginTransaction();
+        _neo4JProvider.beginTransaction();
         // TODO: instanceof check is expensive, consider using a more efficient way to partition
         Map<Boolean, List<TransformerStep.IMethodTransformerOutput>> partitions = input.collect(
                 Collectors.partitioningBy(i -> i instanceof TransformerStep.MethodLinkNode));
@@ -74,19 +74,19 @@ public class LoadStep extends AbstractNeo4jLoaderStep
                     createParameterNode(methodParam.object());
                 }
             });
-        _neo4jService.commitTransactionIfPresent();
+        _neo4JProvider.commitTransactionIfPresent();
 
         // Then create all links
         LOGGER.info("MethodExporter: Creating method links...");
 
-        _neo4jService.beginTransaction();
+        _neo4JProvider.beginTransaction();
         partitions.get(true)
             .forEach(methodTransformerOutput -> {
                 if (methodTransformerOutput instanceof TransformerStep.MethodLinkNode methodLink) {
-                    _neo4jService.creatLinkNode(methodLink.link());
+                    _neo4JProvider.creatLinkNode(methodLink.link());
                 }
             });
-        _neo4jService.commitTransactionIfPresent();
+        _neo4JProvider.commitTransactionIfPresent();
         return new TransformResult();
     }
 }

@@ -1,6 +1,7 @@
 package org.example.pipeline.meta;
 
-import org.example.integration.neo4j.Neo4jService;
+import org.example.integration.api.neo4j.INeo4jProvider;
+import org.example.integration.impl.neo4j.Neo4jProvider;
 import org.neo4j.driver.Session;
 import org.neo4j.driver.Transaction;
 import org.slf4j.Logger;
@@ -13,7 +14,7 @@ public class CreateIndeciesAndConstraintsStep extends AbstractNeo4jMetaStep {
      * Adjust these as needed for your schema.
      */
     @Override
-    public Neo4jService process(Neo4jService input) {
+    public INeo4jProvider process(INeo4jProvider input) {
         LOGGER.info("Creating constraints and indexes...");
         // Create a dedicated session and transaction for schema changes
         try (Session tempSession = input.getDriver().session()) {

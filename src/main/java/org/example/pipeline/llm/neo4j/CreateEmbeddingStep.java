@@ -1,12 +1,13 @@
 package org.example.pipeline.llm.neo4j;
 
-import org.example.integration.neo4j.Neo4jService;
+import org.example.integration.api.neo4j.INeo4jProvider;
+import org.example.integration.impl.neo4j.Neo4jProvider;
 import org.example.pipeline.IPipelineStep;
 import org.neo4j.driver.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CreateEmbeddingStep implements IPipelineStep<Neo4jService, Neo4jService> {
+public class CreateEmbeddingStep implements IPipelineStep<INeo4jProvider, INeo4jProvider> {
   private static final Logger LOG = LoggerFactory.getLogger(CreateEmbeddingStep.class);
   private final String _nodeLabel;
   private final String _nodeProperty;
@@ -18,9 +19,9 @@ public class CreateEmbeddingStep implements IPipelineStep<Neo4jService, Neo4jSer
     this._indexName = indexName;
   }
 
-  private void generateEmbedding(Neo4jService neo4jService) {
-    neo4jService.beginTransaction();
-    neo4jService.runCypher("""
+  private void generateEmbedding(INeo4jProvider neo4JProvider) {
+    neo4JProvider.beginTransaction();
+    neo4JProvider.runCypher("""
         CREATE VECTOR INDEX $indexName IF NOT EXISTS
         FOR (d:$label)
         ON (d.$property)
@@ -36,14 +37,14 @@ public class CreateEmbeddingStep implements IPipelineStep<Neo4jService, Neo4jSer
             "label", _nodeLabel,
             "property", _nodeProperty
         ));
-    neo4jService.commitTransactionIfPresent();
+    neo4JProvider.commitTransactionIfPresent();
   }
 
   @Override
-  public Neo4jService process(Neo4jService neo4jService) {
+  public INeo4jProvider process(INeo4jProvider neo4JProvider) {
     LOG.info("Creating vector index for {} nodes...", _nodeLabel);
-    generateEmbedding(neo4jService);
+    generateEmbedding(neo4JProvider);
     LOG.info("Vector index for {} nodes created successfully.", _nodeLabel);
-    return neo4jService;
+    return neo4JProvider;
   }
 }

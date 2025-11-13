@@ -2,7 +2,8 @@ package org.example.pipeline.code.type;
 
 import org.example.datamodel.neo4j.Neo4JLink;
 import org.example.datamodel.neo4j.Neo4jType;
-import org.example.integration.neo4j.Neo4jService;
+import org.example.integration.api.neo4j.INeo4jProvider;
+import org.example.integration.impl.neo4j.Neo4jProvider;
 import org.example.pipeline.AbstractNeo4jLoaderStep;
 import org.example.pipeline.IPipelineStep;
 import org.example.pipeline.TransformResult;
@@ -16,13 +17,13 @@ public class LoaderStep extends AbstractNeo4jLoaderStep
         implements IPipelineStep<Stream<TransformerStep.ITypeOutput>, TransformResult> {
 
     private static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger(LoaderStep.class);
-    public LoaderStep(Neo4jService neo4jService) {
-        super(neo4jService);
+    public LoaderStep(INeo4jProvider neo4JProvider) {
+        super(neo4JProvider);
     }
 
     private void createTypeNode(Neo4jType node) {
 //             Using MERGE because we might reference the same type multiple times:
-        _neo4jService.runCypher(
+        _neo4JProvider.runCypher(
                 "MERGE (t:Type { name: $typeName }) " +
                         "SET t.simpleName = $simpleName, " +
                         "    t.typeKind = $typeKind, " +
@@ -45,7 +46,7 @@ public class LoaderStep extends AbstractNeo4jLoaderStep
 //        _neo4jService.startSessionAndTransaction();
         LOGGER.info("TypeExporter: Loading types...");
 
-        _neo4jService.beginTransaction();
+        _neo4JProvider.beginTransaction();
 
         createPrimitiveTypeNodes();
         List<TransformerStep.TypeNode> nodes = new ArrayList<>();
@@ -61,9 +62,9 @@ public class LoaderStep extends AbstractNeo4jLoaderStep
         nodes.forEach(n -> createTypeNode(n.object()));
 
         // Phase 2: Insert all links (after all nodes exist)
-        links.forEach(_neo4jService::creatLinkNode);
+        links.forEach(_neo4JProvider::creatLinkNode);
 
-        _neo4jService.commitTransactionIfPresent();
+        _neo4JProvider.commitTransactionIfPresent();
 
         LOGGER.info("TypeExporter: Loaded " + nodes.size() + " types and " + links.size() + " links.");
         return new TransformResult();

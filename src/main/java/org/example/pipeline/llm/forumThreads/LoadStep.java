@@ -2,7 +2,8 @@ package org.example.pipeline.llm.forumThreads;
 
 import org.example.datamodel.neo4j.Neo4jForumThread;
 import org.example.datamodel.neo4j.Neo4jForumThreadTag;
-import org.example.integration.neo4j.Neo4jService;
+import org.example.integration.api.neo4j.INeo4jProvider;
+import org.example.integration.impl.neo4j.Neo4jProvider;
 import org.example.pipeline.AbstractNeo4jLoaderStep;
 import org.example.pipeline.IPipelineStep;
 import org.example.pipeline.TransformResult;
@@ -19,12 +20,12 @@ public class LoadStep extends AbstractNeo4jLoaderStep
     implements IPipelineStep<Stream<TransformStep.IForumThreadOutput>, TransformResult> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LoadStep.class);
-  public LoadStep(Neo4jService neo4jService) {
-    super(neo4jService);
+  public LoadStep(INeo4jProvider neo4JProvider) {
+    super(neo4JProvider);
   }
 
   private void createForumThreadNode(Neo4jForumThread thread) {
-    _neo4jService.runCypher("""
+    _neo4JProvider.runCypher("""
         CREATE (t:ForumThread {
             title: $title,
             threadUrl: $threadUrl,
@@ -56,7 +57,7 @@ public class LoadStep extends AbstractNeo4jLoaderStep
   }
 
   private void createForumThreadTagNode(Neo4jForumThreadTag tag) {
-    _neo4jService.runCypher("""
+    _neo4JProvider.runCypher("""
         MERGE (tag:ForumThreadTag {name: $name})
         """,
         Values.parameters("name", tag.name())
@@ -69,7 +70,7 @@ public class LoadStep extends AbstractNeo4jLoaderStep
         Collectors.partitioningBy(i -> i instanceof TransformStep.ThreadLink));
 
     LOGGER.info("ForumThreadExporter: Loading forum threads...");
-    _neo4jService.beginTransaction();
+    _neo4JProvider.beginTransaction();
     LOGGER.info("ForumThreadExporter: Exporting {} nodes", partitions.get(false).size());
     partitions.get(false).forEach(node -> {
       if (node instanceof TransformStep.ThreadNode threadNode) {
@@ -78,12 +79,12 @@ public class LoadStep extends AbstractNeo4jLoaderStep
         createForumThreadTagNode(tagNode.object());
       }
     });
-    _neo4jService.commitTransactionIfPresent();
+    _neo4JProvider.commitTransactionIfPresent();
 
     LOGGER.info("ForumThreadExporter: Exporting {} links", partitions.get(true).size());
-    _neo4jService.beginTransaction();
-    partitions.get(true).forEach(link -> _neo4jService.creatLinkNode(((TransformStep.ThreadLink)link).object()));
-    _neo4jService.commitTransactionIfPresent();
+    _neo4JProvider.beginTransaction();
+    partitions.get(true).forEach(link -> _neo4JProvider.creatLinkNode(((TransformStep.ThreadLink)link).object()));
+    _neo4JProvider.commitTransactionIfPresent();
 
     return new TransformResult();
   }

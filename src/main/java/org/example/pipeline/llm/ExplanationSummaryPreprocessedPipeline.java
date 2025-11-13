@@ -4,7 +4,8 @@ import org.example.datamodel.knowledge.PreprocessedMethodAnalysis;
 import org.example.datamodel.neo4j.Neo4JLink;
 import org.example.datamodel.neo4j.Neo4jExplanation;
 import org.example.datamodel.neo4j.Neo4jSummary;
-import org.example.integration.neo4j.Neo4jService;
+import org.example.integration.api.neo4j.INeo4jProvider;
+import org.example.integration.impl.neo4j.Neo4jProvider;
 import org.example.pipeline.IPipelineStep;
 import org.example.pipeline.JsonExtractorStep;
 import org.example.pipeline.Pipeline;
@@ -19,7 +20,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class ExplanationSummaryPreprocessedPipeline implements IPipelineStep<Neo4jService, Neo4jService> {
+public class ExplanationSummaryPreprocessedPipeline implements IPipelineStep<INeo4jProvider, INeo4jProvider> {
   public sealed interface IExplanationPreprocessedOutput
       permits ExplanationNode, Link, SummaryNode {}
 
@@ -29,9 +30,9 @@ public class ExplanationSummaryPreprocessedPipeline implements IPipelineStep<Neo
   record SummaryNode(Neo4jSummary object) implements IExplanationPreprocessedOutput {}
   record Link(Neo4JLink object) implements IExplanationPreprocessedOutput {}
 
-  private void createExplanationNode(Neo4jService neo4jService, Neo4jExplanation expNode) {
+  private void createExplanationNode(INeo4jProvider neo4JProvider, Neo4jExplanation expNode) {
     String expNodeId = expNode.id();
-    neo4jService.runCypher("MERGE (e:Explanation {id: $expId}) " +
+    neo4JProvider.runCypher("MERGE (e:Explanation {id: $expId}) " +
             "SET e.text = $text",
         Values.parameters(
             "expId", expNodeId,
@@ -39,9 +40,9 @@ public class ExplanationSummaryPreprocessedPipeline implements IPipelineStep<Neo
         ));
   }
 
-  private void createSummaryNode(Neo4jService neo4jService, Neo4jSummary summaryNode) {
+  private void createSummaryNode(INeo4jProvider neo4JProvider, Neo4jSummary summaryNode) {
     String sumNodeId = summaryNode.id();
-    neo4jService.runCypher("MERGE (s:Summary {id: $sumId}) " +
+    neo4JProvider.runCypher("MERGE (s:Summary {id: $sumId}) " +
             "SET s.text = $text",
         Values.parameters(
             "sumId", sumNodeId,
@@ -50,7 +51,7 @@ public class ExplanationSummaryPreprocessedPipeline implements IPipelineStep<Neo
   }
 
   @Override
-  public Neo4jService process(Neo4jService neo4jService) {
+  public INeo4jProvider process(INeo4jProvider neo4JProvider) {
     Pipeline
         .start(new JsonExtractorStep<>(PreprocessedMethodAnalysis.class, "methods_out_both.json"))
         .then(analysisStream -> {
@@ -89,33 +90,33 @@ public class ExplanationSummaryPreprocessedPipeline implements IPipelineStep<Neo
 
           for (int i = 0; i < partitions.get(false).size(); i++) {
             if (i % 1000 == 0) {
-              neo4jService.commitTransactionIfPresent();
-              neo4jService.beginTransaction();
+              neo4JProvider.commitTransactionIfPresent();
+              neo4JProvider.beginTransaction();
               LOG.info("ExplanationSummaryPreprocessedPipeline: Loaded {} nodes...", i);
             }
             IExplanationPreprocessedOutput node = partitions.get(false).get(i);
             if (node instanceof ExplanationNode expNode) {
-              createExplanationNode(neo4jService, expNode.object());
+              createExplanationNode(neo4JProvider, expNode.object());
             } else if (node instanceof SummaryNode sumNode) {
-              createSummaryNode(neo4jService, sumNode.object());
+              createSummaryNode(neo4JProvider, sumNode.object());
             }
           }
-          neo4jService.beginTransaction();
+          neo4JProvider.beginTransaction();
           LOG.info("ExplanationSummaryPreprocessedPipeline: Loading {} links...", partitions.get(true).size());
           for (int i = 0; i < partitions.get(true).size(); i++) {
             if (i % 1000 == 0) {
-              neo4jService.commitTransactionIfPresent();
-              neo4jService.beginTransaction();
+              neo4JProvider.commitTransactionIfPresent();
+              neo4JProvider.beginTransaction();
               LOG.info("ExplanationSummaryPreprocessedPipeline: Loaded {} links...", i);
             }
             if (partitions.get(true).get(i) instanceof Link expLink) {
-              neo4jService.creatLinkNode(expLink.object());
+              neo4JProvider.creatLinkNode(expLink.object());
             }
           }
-          neo4jService.commitTransactionIfPresent();
+          neo4JProvider.commitTransactionIfPresent();
 
           return new TransformResult();
         }).build().run(0);
-    return neo4jService;
+    return neo4JProvider;
   }
 }

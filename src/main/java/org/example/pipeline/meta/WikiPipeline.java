@@ -1,9 +1,10 @@
 package org.example.pipeline.meta;
 
-import org.example.integration.llm.ILLMProvider;
-import org.example.integration.llm.LLMConfig;
-import org.example.integration.neo4j.Neo4jService;
-import org.example.integration.wiki.IWikiProvider;
+import org.example.integration.api.llm.ILLMProvider;
+import org.example.integration.api.llm.LLMConfig;
+import org.example.integration.api.neo4j.INeo4jProvider;
+import org.example.integration.impl.neo4j.Neo4jProvider;
+import org.example.integration.api.wiki.IWikiProvider;
 import org.example.pipeline.Pipeline;
 import org.example.pipeline.TransformResult;
 import org.example.pipeline.llm.AbstractLLMBatchedPipelineStep;
@@ -26,7 +27,7 @@ public class WikiPipeline extends AbstractLLMBatchedPipelineStep {
     }
 
     @Override
-    protected long getNumTotal(Neo4jService neo4jService) {
+    protected long getNumTotal(INeo4jProvider neo4JProvider) {
         return _wikiProvider.getNumPages(_space)
             .map(count -> (long) count, err -> {
                 _LOGGER.error("Failed to get number of wiki pages: {}", err);
@@ -35,7 +36,7 @@ public class WikiPipeline extends AbstractLLMBatchedPipelineStep {
     }
 
     @Override
-    protected Pipeline<Integer, TransformResult> getPipeline(Neo4jService neo4jService) {
+    protected Pipeline<Integer, TransformResult> getPipeline(INeo4jProvider neo4JProvider) {
         return Pipeline
                 .start(new WikiExtractorStep(_space, _wikiProvider, _currOffset))
 //                .then(new TransformStep(_llmProvider, _llmConfig))

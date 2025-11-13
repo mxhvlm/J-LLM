@@ -2,7 +2,7 @@ package org.example.pipeline.llm.neo4j;
 
 import com.google.gson.Gson;
 import org.example.datamodel.neo4j.Neo4jMethodSummaryContextResult;
-import org.example.integration.neo4j.Neo4jService;
+import org.example.integration.api.neo4j.INeo4jProvider;
 import org.example.pipeline.IPipelineStep;
 import org.neo4j.driver.Values;
 import org.slf4j.Logger;
@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 
 public class MethodContextExtractorStep implements IPipelineStep<Integer, Stream<Neo4jMethodSummaryContextResult>> {
     private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(MethodContextExtractorStep.class);
-    private final Neo4jService _neo4jService;
+    private final INeo4jProvider _neo4JProvider;
     private final Gson _gson;
     private static final String CYPHER_QUERY =
        """
@@ -98,24 +98,24 @@ public class MethodContextExtractorStep implements IPipelineStep<Integer, Stream
        } AS methodInfo
         """;
 
-    public MethodContextExtractorStep(Neo4jService neo4jService) {
-        _neo4jService = neo4jService;
+    public MethodContextExtractorStep(INeo4jProvider neo4JProvider) {
+        _neo4JProvider = neo4JProvider;
         _gson = new Gson();
     }
 
     @Override
     public Stream<Neo4jMethodSummaryContextResult> process(Integer batchSize) {
-        _neo4jService.beginTransaction();
+        _neo4JProvider.beginTransaction();
 
         // Need to materialize the results so we can ensure all records are processed by the db
         // in order to close the tx properly before we start inserting the results
-        List<Neo4jMethodSummaryContextResult> result = _neo4jService.runCypher(CYPHER_QUERY + " LIMIT $batchSize",
+        List<Neo4jMethodSummaryContextResult> result = _neo4JProvider.runCypher(CYPHER_QUERY + " LIMIT $batchSize",
             Values.parameters("batchSize", batchSize))
             .stream()
             .map(r -> r.get("methodInfo").toString())
             .map(s -> _gson.fromJson(s, Neo4jMethodSummaryContextResult.class))
             .toList();
-        _neo4jService.commitTransactionIfPresent();
+        _neo4JProvider.commitTransactionIfPresent();
         return result.stream();
     }
 }

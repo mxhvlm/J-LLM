@@ -1,8 +1,8 @@
 package org.example.pipeline.meta;
 
-import org.example.integration.neo4j.Neo4jService;
-import org.example.integration.llm.ILLMProvider;
-import org.example.integration.llm.LLMConfig;
+import org.example.integration.api.llm.ILLMProvider;
+import org.example.integration.api.llm.LLMConfig;
+import org.example.integration.api.neo4j.INeo4jProvider;
 import org.example.pipeline.TransformResult;
 import org.example.pipeline.llm.AbstractLLMBatchedPipelineStep;
 import org.example.pipeline.llm.explanation.ExplanationLoadStep;
@@ -16,24 +16,24 @@ public class LLMExplanationPipelineStep extends AbstractLLMBatchedPipelineStep {
   }
 
   @Override
-  protected long getNumTotal(Neo4jService neo4jService) {
-    neo4jService.beginTransaction();
-    long result = neo4jService
+  protected long getNumTotal(INeo4jProvider neo4JProvider) {
+    neo4JProvider.beginTransaction();
+    long result = neo4JProvider
         .runCypher("MATCH (m:Method) RETURN count(m) AS count")
         .stream()
         .findFirst()
         .map(record -> record.get("count").asLong())
         .orElseThrow(() -> new IllegalStateException("Failed to get total methods to process"));
-    neo4jService.commitTransactionIfPresent();
+    neo4JProvider.commitTransactionIfPresent();
     return result;
   }
 
   @Override
-  protected Pipeline<Integer, TransformResult> getPipeline(Neo4jService neo4jService) {
+  protected Pipeline<Integer, TransformResult> getPipeline(INeo4jProvider neo4JProvider) {
     return  Pipeline
-        .start(new MethodContextExtractorStep(neo4jService))
+        .start(new MethodContextExtractorStep(neo4JProvider))
         .then(new ExplanationTransformStep(_llmProvider, _llmConfig))
-        .then(new ExplanationLoadStep(neo4jService))
+        .then(new ExplanationLoadStep(neo4JProvider))
         .build();
   }
 }

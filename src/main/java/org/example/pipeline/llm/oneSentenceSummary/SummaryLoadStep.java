@@ -1,7 +1,8 @@
 package org.example.pipeline.llm.oneSentenceSummary;
 
 import org.example.datamodel.neo4j.Neo4jSummary;
-import org.example.integration.neo4j.Neo4jService;
+import org.example.integration.api.neo4j.INeo4jProvider;
+import org.example.integration.impl.neo4j.Neo4jProvider;
 import org.example.pipeline.AbstractNeo4jLoaderStep;
 import org.example.pipeline.IPipelineStep;
 import org.example.pipeline.TransformResult;
@@ -16,13 +17,13 @@ import java.util.stream.Stream;
 public class SummaryLoadStep extends AbstractNeo4jLoaderStep
     implements IPipelineStep<Stream<SummaryTransformStep.ILLMSummaryStepOutput>, TransformResult> {
   private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(SummaryLoadStep.class);
-  public SummaryLoadStep(Neo4jService neo4jService) {
-    super(neo4jService);
+  public SummaryLoadStep(INeo4jProvider neo4JProvider) {
+    super(neo4JProvider);
   }
 
   private void createSummaryNode(Neo4jSummary summaryNode) {
     String sumNodeId = summaryNode.id();
-    _neo4jService.runCypher("MERGE (s:Summary {id: $sumId}) " +
+    _neo4JProvider.runCypher("MERGE (s:Summary {id: $sumId}) " +
         "SET s.text = $text",
         Values.parameters(
             "sumId", sumNodeId,
@@ -37,7 +38,7 @@ public class SummaryLoadStep extends AbstractNeo4jLoaderStep
     LOGGER.info("SummaryLoader: Loading {} summaries...",
         partitions.get(false).size());
 
-    _neo4jService.beginTransaction();
+    _neo4JProvider.beginTransaction();
     partitions.get(false).forEach(sumNode -> {
       createSummaryNode(((SummaryTransformStep.SummaryNode) sumNode).object());
     });
@@ -45,9 +46,9 @@ public class SummaryLoadStep extends AbstractNeo4jLoaderStep
     LOGGER.info("SummaryLoader: Loading {} summary links...",
         partitions.get(true).size());
     partitions.get(true).forEach(sumLink -> {
-      _neo4jService.creatLinkNode(((SummaryTransformStep.SummaryLink) sumLink).object());
+      _neo4JProvider.creatLinkNode(((SummaryTransformStep.SummaryLink) sumLink).object());
     });
-    _neo4jService.commitTransactionIfPresent();
+    _neo4JProvider.commitTransactionIfPresent();
     return null;
   }
 }

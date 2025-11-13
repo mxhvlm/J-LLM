@@ -6,7 +6,8 @@ import org.example.datamodel.neo4j.Neo4JLink;
 import org.example.datamodel.neo4j.Neo4jForumThread;
 import org.example.datamodel.neo4j.Neo4jForumThreadTag;
 import org.example.datamodel.neo4j.Neo4jType;
-import org.example.integration.neo4j.Neo4jService;
+import org.example.integration.api.neo4j.INeo4jProvider;
+import org.example.integration.impl.neo4j.Neo4jProvider;
 import org.example.pipeline.IPipelineStep;
 import org.neo4j.driver.Values;
 import org.neo4j.driver.types.Node;
@@ -23,11 +24,11 @@ public class TransformStepPreprocessed
         Stream<TransformStep.IForumThreadOutput>> {
   private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(TransformStepPreprocessed.class);
   private final Gson _gson;
-  private final Neo4jService _neo4jService;
+  private final INeo4jProvider _neo4JProvider;
 
-  public TransformStepPreprocessed(Neo4jService neo4jService) {
+  public TransformStepPreprocessed(INeo4jProvider neo4JProvider) {
     _gson = new Gson();
-    _neo4jService = neo4jService;
+    _neo4JProvider = neo4JProvider;
   }
 
   record ThreadNode(Neo4jForumThread object) implements TransformStep.IForumThreadOutput {}
@@ -35,8 +36,8 @@ public class TransformStepPreprocessed
   record ThreadLink(Neo4JLink object) implements TransformStep.IForumThreadOutput {}
 
   private Collection<Neo4jType> lookupTypeByNameOrSimpleName(String typeName) {
-    _neo4jService.beginTransaction();
-    Collection<Neo4jType> types = _neo4jService.runCypher(
+    _neo4JProvider.beginTransaction();
+    Collection<Neo4jType> types = _neo4JProvider.runCypher(
             "MATCH (t:Type) WHERE t.name = $typeName OR t.simpleName = $typeName RETURN t",
             Values.parameters("typeName", typeName))
         .stream()
@@ -51,7 +52,7 @@ public class TransformStepPreprocessed
           );
         })
         .toList();
-    _neo4jService.commitTransactionIfPresent();
+    _neo4JProvider.commitTransactionIfPresent();
     return types;
   }
 

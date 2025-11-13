@@ -1,6 +1,6 @@
 package org.example.pipeline.meta;
 
-import org.example.integration.neo4j.Neo4jService;
+import org.example.integration.api.neo4j.INeo4jProvider;
 import org.example.pipeline.Pipeline;
 import org.example.pipeline.TransformResult;
 import org.slf4j.Logger;
@@ -14,16 +14,16 @@ public abstract class AbstractBatchedPipelineStep extends AbstractNeo4jMetaStep 
         _batchSize = batchSize;
     }
 
-    protected abstract long getNumTotal(Neo4jService neo4jService);
+    protected abstract long getNumTotal(INeo4jProvider neo4JProvider);
 
     @Override
-    public Neo4jService process(Neo4jService neo4jService) {
+    public INeo4jProvider process(INeo4jProvider neo4JProvider) {
         // Set up the pipeline
         Pipeline<Integer, TransformResult> pipeline = getPipeline(
-            neo4jService);
+                neo4JProvider);
 
         // Run the pipeline once for every batch until no more methods without an explanation are found
-        long total = getNumTotal(neo4jService);
+        long total = getNumTotal(neo4JProvider);
         long processed = 0;
         LOGGER.info("Total elements to process: {}", total);
         while (processed < total) {
@@ -33,8 +33,8 @@ public abstract class AbstractBatchedPipelineStep extends AbstractNeo4jMetaStep 
             LOGGER.info("Processed {} of {} methods ({}%)", processed, total,
                 (double) processed / total * 100);
         }
-        return neo4jService;
+        return neo4JProvider;
     }
 
-    protected abstract Pipeline<Integer, TransformResult> getPipeline(Neo4jService neo4jService);
+    protected abstract Pipeline<Integer, TransformResult> getPipeline(INeo4jProvider neo4JProvider);
 }

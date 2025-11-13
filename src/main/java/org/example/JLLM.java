@@ -1,15 +1,15 @@
 package org.example;
 
-import org.example.integration.neo4j.Neo4jService;
-import org.example.integration.llm.APIConfig;
-import org.example.integration.llm.ILLMProvider;
-import org.example.integration.llm.LLMConfig;
-import org.example.integration.llm.providerImpl.OpenAIProvider;
-import org.example.integration.wiki.IWikiProvider;
-import org.example.integration.wiki.providerImpl.redmine.RedmineApiConfig;
-import org.example.integration.wiki.providerImpl.redmine.RedmineProvider;
+import org.example.integration.api.ITokenAuthConfig;
+import org.example.integration.api.neo4j.INeo4jProvider;
+import org.example.integration.impl.TokenAuthConfig;
+import org.example.integration.api.llm.ILLMProvider;
+import org.example.integration.api.llm.LLMConfig;
+import org.example.integration.impl.neo4j.Neo4jProvider;
+import org.example.integration.impl.openAI.OpenAIProvider;
+import org.example.integration.api.wiki.IWikiProvider;
+import org.example.integration.impl.redmine.wiki.RedmineProvider;
 import org.example.pipeline.Pipeline;
-import org.example.pipeline.llm.ExplanationSummaryPreprocessedPipeline;
 import org.example.pipeline.meta.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,9 +18,9 @@ import org.slf4j.LoggerFactory;
 public class JLLM implements Runnable {
     public static final Logger LOGGER = LoggerFactory.getLogger(JLLM.class);
     private final JLLMConfig _config;
-    private final Pipeline<Neo4jService, Neo4jService> _metaPipeline;
+    private final Pipeline<INeo4jProvider, INeo4jProvider> _metaPipeline;
 
-    private APIConfig readOpenAIConfig() {
+    private ITokenAuthConfig readOpenAIConfig() {
         String apiToken = System.getenv("OPENAI_API_KEY");
         String apiUrl = System.getenv("OPENAI_API_URL");
 
@@ -28,10 +28,10 @@ public class JLLM implements Runnable {
             LOGGER.error("OpenAI API key or URL not set in environment variables.");
             throw new IllegalStateException("OpenAI API key or URL not set in environment variables.");
         }
-        return new APIConfig(apiUrl, apiToken);
+        return new TokenAuthConfig(apiUrl, apiToken);
     }
 
-    private RedmineApiConfig readReadmineConfig() {
+    private ITokenAuthConfig readReadmineConfig() {
         String apiToken = System.getenv("REDMINE_API_KEY");
         String apiUrl = System.getenv("REDMINE_API_URL");
 
@@ -39,7 +39,7 @@ public class JLLM implements Runnable {
             LOGGER.error("Redmine API key or URL not set in environment variables.");
             throw new IllegalStateException("Redmine API key or URL not set in environment variables.");
         }
-        return new RedmineApiConfig(apiUrl, apiToken);
+        return new TokenAuthConfig(apiUrl, apiToken);
     }
 
     public JLLM() {
@@ -87,12 +87,12 @@ public class JLLM implements Runnable {
     @Override
     public void run() {
         LOGGER.info("JLLM: Running import...");
-        Neo4jService neo4jService = new Neo4jService(
+        INeo4jProvider neo4JProvider = new Neo4jProvider(
                 _config.getNeo4jUri(),
                 _config.getNeo4jUser(),
                 _config.getNeo4jPassword());
 
-            _metaPipeline.run(neo4jService);
+            _metaPipeline.run(neo4JProvider);
 
             System.out.println("Modules and packages imported successfully. Exiting...");
     }

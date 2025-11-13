@@ -2,9 +2,9 @@ package org.example.pipeline.meta;
 
 import com.google.gson.JsonParser;
 import org.example.datamodel.knowledge.ProcessedForumThread;
-import org.example.integration.neo4j.Neo4jService;
-import org.example.integration.llm.ILLMProvider;
-import org.example.integration.llm.LLMConfig;
+import org.example.integration.api.llm.ILLMProvider;
+import org.example.integration.api.llm.LLMConfig;
+import org.example.integration.api.neo4j.INeo4jProvider;
 import org.example.pipeline.JsonExtractorStep;
 import org.example.pipeline.Pipeline;
 import org.example.pipeline.TransformResult;
@@ -27,7 +27,7 @@ public class ForumThreadsPipeline extends AbstractLLMBatchedPipelineStep {
   }
 
   @Override
-  protected long getNumTotal(Neo4jService neo4jService) {
+  protected long getNumTotal(INeo4jProvider neo4JProvider) {
     try (FileReader reader = new FileReader(_filePath)) {
       return JsonParser.parseReader(reader).getAsJsonArray().size();
     } catch (IOException e) {
@@ -36,11 +36,11 @@ public class ForumThreadsPipeline extends AbstractLLMBatchedPipelineStep {
   }
 
   @Override
-  protected Pipeline<Integer, TransformResult> getPipeline(Neo4jService neo4jService) {
+  protected Pipeline<Integer, TransformResult> getPipeline(INeo4jProvider neo4JProvider) {
     return Pipeline
         .start(new JsonExtractorStep<>(ProcessedForumThread.class, _filePath, _currCursor, _batchSize))
-        .then(new TransformStep(_llmProvider, _llmConfig, neo4jService))
-        .then(new LoadStep(neo4jService))
+        .then(new TransformStep(_llmProvider, _llmConfig, neo4JProvider))
+        .then(new LoadStep(neo4JProvider))
         .then(input -> {
           _currCursor += _batchSize;
           return input;

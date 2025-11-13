@@ -1,7 +1,8 @@
 package org.example.pipeline.llm.explanation;
 
 import org.example.datamodel.neo4j.Neo4jExplanation;
-import org.example.integration.neo4j.Neo4jService;
+import org.example.integration.api.neo4j.INeo4jProvider;
+import org.example.integration.impl.neo4j.Neo4jProvider;
 import org.example.pipeline.AbstractNeo4jLoaderStep;
 import org.example.pipeline.IPipelineStep;
 import org.example.pipeline.TransformResult;
@@ -18,13 +19,13 @@ public class ExplanationLoadStep extends AbstractNeo4jLoaderStep
 
   private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(ExplanationLoadStep.class);
 
-  public ExplanationLoadStep(Neo4jService neo4jService) {
-    super(neo4jService);
+  public ExplanationLoadStep(INeo4jProvider neo4JProvider) {
+    super(neo4JProvider);
   }
 
   private void createExplanationNode(Neo4jExplanation expNode) {
     String expNodeId = expNode.id();
-    _neo4jService.runCypher("MERGE (e:Explanation {id: $expId}) " +
+    _neo4JProvider.runCypher("MERGE (e:Explanation {id: $expId}) " +
         "SET e.text = $text",
         Values.parameters(
             "expId", expNodeId,
@@ -39,7 +40,7 @@ public class ExplanationLoadStep extends AbstractNeo4jLoaderStep
     LOGGER.info("ExplanationLoader: Loading {} explanations...",
         partitions.get(false).size());
 
-    _neo4jService.beginTransaction();
+    _neo4JProvider.beginTransaction();
     partitions.get(false).forEach(expNode -> {
       createExplanationNode(((ExplanationTransformStep.ExplanationNode) expNode).object());
     });
@@ -47,9 +48,9 @@ public class ExplanationLoadStep extends AbstractNeo4jLoaderStep
     LOGGER.info("ExplanationLoader: Loading {} explanation links...",
         partitions.get(true).size());
     partitions.get(true).forEach(expLink -> {
-      _neo4jService.creatLinkNode(((ExplanationTransformStep.ExplanationLink) expLink).object());
+      _neo4JProvider.creatLinkNode(((ExplanationTransformStep.ExplanationLink) expLink).object());
     });
-    _neo4jService.commitTransactionIfPresent();
+    _neo4JProvider.commitTransactionIfPresent();
     return null;
   }
 }

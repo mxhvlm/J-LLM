@@ -4,9 +4,10 @@ import com.google.gson.Gson;
 import org.example.datamodel.knowledge.ProcessedForumThread;
 import org.example.datamodel.knowledge.SafeProcessedForumThread;
 import org.example.datamodel.neo4j.*;
-import org.example.integration.neo4j.Neo4jService;
-import org.example.integration.llm.ILLMProvider;
-import org.example.integration.llm.LLMConfig;
+import org.example.integration.api.neo4j.INeo4jProvider;
+import org.example.integration.impl.neo4j.Neo4jProvider;
+import org.example.integration.api.llm.ILLMProvider;
+import org.example.integration.api.llm.LLMConfig;
 import org.example.pipeline.llm.AbstractLLMTransformStep;
 import org.neo4j.driver.Values;
 import org.neo4j.driver.types.Node;
@@ -22,7 +23,7 @@ public class TransformStep
     TransformStep.IForumThreadOutput> {
   private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(TransformStep.class);
   private final Gson _gson;
-  private final Neo4jService _neo4jService;
+  private final INeo4jProvider _neo4JProvider;
   private final String _llmPrompt = """
 Extract the following details from the forum post in JSON format:
 - Problem statement: Clearly state the main problem or question asked.
@@ -50,10 +51,10 @@ Output format:
 Output JSON (nothing else):
 """;
 
-  public TransformStep(ILLMProvider llmProvider, LLMConfig config, Neo4jService neo4jService) {
+  public TransformStep(ILLMProvider llmProvider, LLMConfig config, INeo4jProvider neo4JProvider) {
     super(llmProvider, config);
     _gson = new Gson();
-    _neo4jService = neo4jService;
+    _neo4JProvider = neo4JProvider;
   }
 
   public sealed interface IForumThreadOutput
@@ -64,8 +65,8 @@ Output JSON (nothing else):
   record ThreadLink(Neo4JLink object) implements IForumThreadOutput {}
 
   private Collection<Neo4jType> lookupTypeByNameOrSimpleName(String typeName) {
-    _neo4jService.beginTransaction();
-    Collection<Neo4jType> types = _neo4jService.runCypher(
+    _neo4JProvider.beginTransaction();
+    Collection<Neo4jType> types = _neo4JProvider.runCypher(
             "MATCH (t:Type) WHERE t.name = $typeName OR t.simpleName = $typeName RETURN t",
             Values.parameters("typeName", typeName))
         .stream()
@@ -80,7 +81,7 @@ Output JSON (nothing else):
           );
         })
         .toList();
-    _neo4jService.commitTransactionIfPresent();
+    _neo4JProvider.commitTransactionIfPresent();
     return types;
   }
   @Override

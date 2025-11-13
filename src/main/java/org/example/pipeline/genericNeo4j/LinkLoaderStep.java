@@ -1,7 +1,8 @@
 package org.example.pipeline.genericNeo4j;
 
 import org.example.datamodel.neo4j.Neo4JLink;
-import org.example.integration.neo4j.Neo4jService;
+import org.example.integration.api.neo4j.INeo4jProvider;
+import org.example.integration.impl.neo4j.Neo4jProvider;
 import org.example.pipeline.AbstractNeo4jLoaderStep;
 import org.example.pipeline.IPipelineStep;
 import org.example.pipeline.TransformResult;
@@ -14,8 +15,8 @@ public class LinkLoaderStep extends AbstractNeo4jLoaderStep
     implements IPipelineStep<Stream<Neo4JLink>, TransformResult> {
     private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(LinkLoaderStep.class);
 
-    public LinkLoaderStep(Neo4jService neo4jService) {
-        super(neo4jService);
+    public LinkLoaderStep(INeo4jProvider neo4JProvider) {
+        super(neo4JProvider);
     }
 
     @Override
@@ -23,9 +24,9 @@ public class LinkLoaderStep extends AbstractNeo4jLoaderStep
         List<Neo4JLink> links = input.toList();
         LOG.info("LinkExporter: Loading {} links...", links.size());
 
-        _neo4jService.beginTransaction();
-        links.forEach(_neo4jService::creatLinkNode);
-        _neo4jService.commitTransactionIfPresent();
+        _neo4JProvider.beginTransaction();
+        links.forEach(_neo4JProvider::creatLinkNode);
+        _neo4JProvider.commitTransactionIfPresent();
 
         return new TransformResult();
     }

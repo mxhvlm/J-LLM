@@ -3,8 +3,8 @@ package org.example.pipeline.llm.explanation;
 import org.example.datamodel.neo4j.Neo4JLink;
 import org.example.datamodel.neo4j.Neo4jExplanation;
 import org.example.datamodel.neo4j.Neo4jMethodSummaryContextResult;
-import org.example.integration.llm.ILLMProvider;
-import org.example.integration.llm.LLMConfig;
+import org.example.integration.api.llm.ILLMProvider;
+import org.example.integration.api.llm.LLMConfig;
 import org.example.pipeline.llm.AbstractLLMTransformStep;
 
 import java.util.Collection;
@@ -17,11 +17,8 @@ public class ExplanationTransformStep
     Neo4jMethodSummaryContextResult,
       ExplanationTransformStep.ILLMExplanationStepOutput> {
 
-  private final LLMConfig _config;
-
   public ExplanationTransformStep(ILLMProvider llmProvider, LLMConfig config) {
-    super(llmProvider);
-    _config = config;
+    super(llmProvider, config);
   }
 
   public sealed interface ILLMExplanationStepOutput

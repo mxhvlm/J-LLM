@@ -1,7 +1,7 @@
 package org.example.pipeline.llm.wiki;
 
-import org.example.integration.wiki.IWikiProvider;
-import org.example.integration.wiki.WikiPage;
+import org.example.integration.api.wiki.IWikiPage;
+import org.example.integration.api.wiki.IWikiProvider;
 import org.example.pipeline.IPipelineStep;
 
 import java.util.stream.Stream;
@@ -20,7 +20,7 @@ public class WikiExtractorStep implements IPipelineStep<Integer, Stream<String>>
     @Override
     public Stream<String> process(Integer batchSize) {
         return _wikiProvider.getPageContentPaginated(_space, _offset, batchSize)
-            .map(pages -> pages.stream().map(WikiPage::content),
+            .map(pages -> pages.stream().map(IWikiPage::content),
                 err -> {
                     throw new RuntimeException("Failed to fetch wiki pages: " + err);
                 });
