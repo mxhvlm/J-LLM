@@ -1,14 +1,14 @@
 package org.example.pipeline.code;
 
-import org.example.datamodel.impl.code.CodeModel;
+import org.example.datamodel.api.code.ICodeModel;
 import org.example.datamodel.impl.code.spoon.SpoonModelBuilder;
 import org.example.pipeline.IPipelineStep;
 
 import java.util.List;
 
-public class SpoonModelBuilderStep implements IPipelineStep<List<String>, CodeModel> {
+public class SpoonModelBuilderStep implements IPipelineStep<List<String>, ICodeModel> {
     @Override
-    public CodeModel process(List<String> input) {
+    public ICodeModel process(List<String> input) {
         return new SpoonModelBuilder().withInputResources(input).buildModel();
     }
 }

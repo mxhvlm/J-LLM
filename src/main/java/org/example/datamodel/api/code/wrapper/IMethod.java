@@ -1,7 +1,5 @@
 package org.example.datamodel.api.code.wrapper;
 
-import org.example.datamodel.impl.code.wrapper.CodeObjectRegistry;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -88,5 +86,5 @@ public interface IMethod extends INamedElement {
      *
      * @param registry The code object registry to use for de-duplication
      */
-    void resolveStaticRefs(CodeObjectRegistry registry);
+    void resolveStaticRefs(ICodeObjectRegistry registry);
 }

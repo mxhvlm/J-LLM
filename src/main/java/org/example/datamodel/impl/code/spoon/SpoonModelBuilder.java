@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 public class SpoonModelBuilder implements IModelBuilder {
     private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(SpoonModelBuilder.class);
 
-    private final CodeObjectRegistry _objectRegistry;
+    private final ICodeObjectRegistry _objectRegistry;
     private final List<String> _inputResourcePaths;
     private boolean _enableAutoImports = true;
     private String _modelName = "Model";

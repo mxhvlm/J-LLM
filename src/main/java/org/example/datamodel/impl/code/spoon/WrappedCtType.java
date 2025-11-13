@@ -2,7 +2,6 @@ package org.example.datamodel.impl.code.spoon;
 
 import org.example.datamodel.api.code.wrapper.*;
 import org.example.datamodel.impl.code.wrapper.AbstractWrappedType;
-import org.example.datamodel.impl.code.wrapper.CodeObjectRegistry;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtPackage;
 import spoon.reflect.declaration.CtType;
@@ -19,7 +18,7 @@ public class WrappedCtType extends AbstractWrappedType<CtType<?>> {
     }
 
     @Override
-    protected List<IField> resolveFields(CodeObjectRegistry registry) {
+    protected List<IField> resolveFields(ICodeObjectRegistry registry) {
         return getWrappedObject().getFields()
                 .stream()
                 .map(field -> registry.getRegister(IField.class).getOrCreate(
@@ -29,7 +28,7 @@ public class WrappedCtType extends AbstractWrappedType<CtType<?>> {
     }
 
     @Override
-    protected List<IMethod> resolveMethods(CodeObjectRegistry registry) {
+    protected List<IMethod> resolveMethods(ICodeObjectRegistry registry) {
         return getWrappedObject().getMethods()
                 .stream()
                 .map(method -> registry.getRegister(IMethod.class).getOrCreate(
@@ -39,7 +38,7 @@ public class WrappedCtType extends AbstractWrappedType<CtType<?>> {
     }
 
     @Override
-    protected List<IType> resolveInnerTypes(CodeObjectRegistry registry) {
+    protected List<IType> resolveInnerTypes(ICodeObjectRegistry registry) {
         return getWrappedObject().getNestedTypes()
                 .stream()
                 .map(type -> registry.getRegister(IType.class)
@@ -48,7 +47,7 @@ public class WrappedCtType extends AbstractWrappedType<CtType<?>> {
     }
 
     @Override
-    protected Optional<IType> resolveSuperType(CodeObjectRegistry registry) {
+    protected Optional<IType> resolveSuperType(ICodeObjectRegistry registry) {
         if (getWrappedObject().getSuperclass() != null && getWrappedObject().getSuperclass().getTypeDeclaration() != null) {
             return Optional.of(
                     registry.getRegister(IType.class).getOrCreate(
@@ -62,7 +61,7 @@ public class WrappedCtType extends AbstractWrappedType<CtType<?>> {
     }
 
     @Override
-    protected List<IType> resolveInterfaces(CodeObjectRegistry registry) {
+    protected List<IType> resolveInterfaces(ICodeObjectRegistry registry) {
         return getWrappedObject().getSuperInterfaces().stream().map(interfaceRef -> {
             if (interfaceRef.getTypeDeclaration() != null) {
                 return registry.getRegister(IType.class).getOrCreate(
@@ -76,7 +75,7 @@ public class WrappedCtType extends AbstractWrappedType<CtType<?>> {
     }
 
     @Override
-    protected Optional<INamedElement> resolveParent(CodeObjectRegistry registry) {
+    protected Optional<INamedElement> resolveParent(ICodeObjectRegistry registry) {
         if (!_wrappedObject.isParentInitialized()) {
             return Optional.empty();
         }
@@ -97,7 +96,7 @@ public class WrappedCtType extends AbstractWrappedType<CtType<?>> {
     }
 
     @Override
-    protected EnumTypeKind resolveTypeKind(CodeObjectRegistry registry) {
+    protected EnumTypeKind resolveTypeKind(ICodeObjectRegistry registry) {
         if (getWrappedObject().isClass()) return EnumTypeKind.CLASS;
         if (getWrappedObject().isInterface()) return EnumTypeKind.INTERFACE;
         if (getWrappedObject().isEnum()) return EnumTypeKind.ENUM;
@@ -106,7 +105,7 @@ public class WrappedCtType extends AbstractWrappedType<CtType<?>> {
     }
 
     @Override
-    protected Collection<String> resolveModifiers(CodeObjectRegistry registry) {
+    protected Collection<String> resolveModifiers(ICodeObjectRegistry registry) {
         return getWrappedObject().getModifiers()
                 .stream()
                 .map(Enum::name)

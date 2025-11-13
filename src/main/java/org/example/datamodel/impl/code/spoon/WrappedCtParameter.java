@@ -1,9 +1,9 @@
 package org.example.datamodel.impl.code.spoon;
 
+import org.example.datamodel.api.code.wrapper.ICodeObjectRegistry;
 import org.example.datamodel.api.code.wrapper.INamedElement;
 import org.example.datamodel.api.code.wrapper.IType;
 import org.example.datamodel.impl.code.wrapper.AbstractWrappedParameter;
-import org.example.datamodel.impl.code.wrapper.CodeObjectRegistry;
 import spoon.reflect.declaration.CtParameter;
 
 import java.util.Optional;
@@ -14,7 +14,7 @@ public class WrappedCtParameter extends AbstractWrappedParameter {
     }
 
     @Override
-    protected Optional<IType> resolveType(CodeObjectRegistry registry) {
+    protected Optional<IType> resolveType(ICodeObjectRegistry registry) {
         if (getWrappedObject().getType() == null || getWrappedObject().getType().getTypeDeclaration() == null) {
             return Optional.empty();
         }

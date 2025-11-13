@@ -1,6 +1,7 @@
 package org.example.datamodel.impl.code.wrapper;
 
 import org.example.datamodel.api.code.IQualifiedName;
+import org.example.datamodel.api.code.wrapper.ICodeObjectRegistry;
 import org.example.datamodel.api.code.wrapper.INamedElement;
 import org.example.datamodel.api.code.wrapper.IWrappedObject;
 import org.slf4j.Logger;
@@ -22,7 +23,7 @@ public abstract class AbstractWrappedElement<T> implements IWrappedObject<T>, IN
     }
 
     @Override
-    public void resolve(CodeObjectRegistry registry) {
+    public void resolve(ICodeObjectRegistry registry) {
         if (_isResolved) {
             throw new IllegalStateException("Element is already resolved: " + getName());
         }

@@ -1,9 +1,9 @@
 package org.example.datamodel.impl.code.spoon;
 
+import org.example.datamodel.api.code.wrapper.ICodeObjectRegistry;
 import org.example.datamodel.api.code.wrapper.IField;
 import org.example.datamodel.api.code.wrapper.IType;
 import org.example.datamodel.impl.code.wrapper.AbstractWrappedElement;
-import org.example.datamodel.impl.code.wrapper.CodeObjectRegistry;
 import org.neo4j.driver.internal.shaded.reactor.util.annotation.Nullable;
 import spoon.reflect.declaration.CtField;
 
@@ -39,7 +39,7 @@ public class WrappedCtField extends AbstractWrappedElement<CtField<?>> implement
     }
 
     @Override
-    public void resolve(CodeObjectRegistry registry) {
+    public void resolve(ICodeObjectRegistry registry) {
         super.resolve(registry);
 
         if (getWrappedObject().getType().getTypeDeclaration() != null) {

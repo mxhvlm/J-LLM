@@ -31,7 +31,7 @@ public abstract class AbstractWrappedType<T> extends AbstractWrappedElement<T> i
     }
 
     @Override
-    public void resolve(CodeObjectRegistry registry) {
+    public void resolve(ICodeObjectRegistry registry) {
         super.resolve(registry);
 
         _parent = resolveParent(registry).orElse(null);
@@ -94,19 +94,19 @@ public abstract class AbstractWrappedType<T> extends AbstractWrappedElement<T> i
     }
 
     // Hook methods providing lib-specific resolution logic
-    protected abstract List<IField> resolveFields(CodeObjectRegistry registry);
+    protected abstract List<IField> resolveFields(ICodeObjectRegistry registry);
 
-    protected abstract List<IMethod> resolveMethods(CodeObjectRegistry registry);
+    protected abstract List<IMethod> resolveMethods(ICodeObjectRegistry registry);
 
-    protected abstract List<IType> resolveInnerTypes(CodeObjectRegistry registry);
+    protected abstract List<IType> resolveInnerTypes(ICodeObjectRegistry registry);
 
-    protected abstract Optional<IType> resolveSuperType(CodeObjectRegistry registry);
+    protected abstract Optional<IType> resolveSuperType(ICodeObjectRegistry registry);
 
-    protected abstract List<IType> resolveInterfaces(CodeObjectRegistry registry);
+    protected abstract List<IType> resolveInterfaces(ICodeObjectRegistry registry);
 
-    protected abstract Optional<INamedElement> resolveParent(CodeObjectRegistry registry);
+    protected abstract Optional<INamedElement> resolveParent(ICodeObjectRegistry registry);
 
-    protected abstract EnumTypeKind resolveTypeKind(CodeObjectRegistry registry);
+    protected abstract EnumTypeKind resolveTypeKind(ICodeObjectRegistry registry);
 
-    protected abstract Collection<String> resolveModifiers(CodeObjectRegistry registry);
+    protected abstract Collection<String> resolveModifiers(ICodeObjectRegistry registry);
 }

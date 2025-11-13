@@ -33,7 +33,7 @@ public abstract class AbstractWrappedMethod<T> extends AbstractWrappedElement<T>
     }
 
     @Override
-    public void resolve(CodeObjectRegistry registry) {
+    public void resolve(ICodeObjectRegistry registry) {
         super.resolve(registry);
 
         _modifiers.addAll(resolveModifiers(registry));
@@ -47,7 +47,7 @@ public abstract class AbstractWrappedMethod<T> extends AbstractWrappedElement<T>
     }
 
     @Override
-    public void resolveStaticRefs(CodeObjectRegistry registry) {
+    public void resolveStaticRefs(ICodeObjectRegistry registry) {
         _referencedMethods.addAll(resolveReferencedMethods(registry));
     }
 
@@ -100,21 +100,21 @@ public abstract class AbstractWrappedMethod<T> extends AbstractWrappedElement<T>
     }
 
     // Hook methods providing the lib-specific resolution logic
-    protected abstract List<String> resolveModifiers(CodeObjectRegistry registry);
+    protected abstract List<String> resolveModifiers(ICodeObjectRegistry registry);
 
-    protected abstract List<IParameter> resolveParameters(CodeObjectRegistry registry);
+    protected abstract List<IParameter> resolveParameters(ICodeObjectRegistry registry);
 
-    protected abstract List<IType> resolveExceptions(CodeObjectRegistry registry);
+    protected abstract List<IType> resolveExceptions(ICodeObjectRegistry registry);
 
-    protected abstract Optional<IType> resolveReturnType(CodeObjectRegistry registry);
+    protected abstract Optional<IType> resolveReturnType(ICodeObjectRegistry registry);
 
-    protected abstract String resolveSignature(CodeObjectRegistry registry);
+    protected abstract String resolveSignature(ICodeObjectRegistry registry);
 
-    protected abstract String resolveMethodBody(CodeObjectRegistry registry);
+    protected abstract String resolveMethodBody(ICodeObjectRegistry registry);
 
-    protected abstract String resolveDocumentation(CodeObjectRegistry registry);
+    protected abstract String resolveDocumentation(ICodeObjectRegistry registry);
 
-    protected abstract List<IMethod> resolveReferencedMethods(CodeObjectRegistry registry);
+    protected abstract List<IMethod> resolveReferencedMethods(ICodeObjectRegistry registry);
 
-    protected abstract List<IField> resolveReferencedFields(CodeObjectRegistry registry);
+    protected abstract List<IField> resolveReferencedFields(ICodeObjectRegistry registry);
 }

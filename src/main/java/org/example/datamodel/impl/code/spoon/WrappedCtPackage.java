@@ -1,9 +1,9 @@
 package org.example.datamodel.impl.code.spoon;
 
+import org.example.datamodel.api.code.wrapper.ICodeObjectRegistry;
 import org.example.datamodel.api.code.wrapper.IPackage;
 import org.example.datamodel.api.code.wrapper.IType;
 import org.example.datamodel.impl.code.wrapper.AbstractWrappedPackage;
-import org.example.datamodel.impl.code.wrapper.CodeObjectRegistry;
 import spoon.reflect.declaration.CtPackage;
 
 import java.util.List;
@@ -15,7 +15,7 @@ public class WrappedCtPackage extends AbstractWrappedPackage<CtPackage> implemen
     }
 
     @Override
-    protected List<IType> resolveSubTypes(CodeObjectRegistry registry) {
+    protected List<IType> resolveSubTypes(ICodeObjectRegistry registry) {
         return getWrappedObject().getTypes()
                 .stream()
                 .map(type -> registry.getRegister(IType.class).getOrCreate(
@@ -25,7 +25,7 @@ public class WrappedCtPackage extends AbstractWrappedPackage<CtPackage> implemen
     }
 
     @Override
-    protected List<IPackage> resolveSubPackages(CodeObjectRegistry registry) {
+    protected List<IPackage> resolveSubPackages(ICodeObjectRegistry registry) {
         return getWrappedObject().getPackages()
                 .stream()
                 .map(subPkg -> registry.getRegister(IPackage.class).getOrCreate(

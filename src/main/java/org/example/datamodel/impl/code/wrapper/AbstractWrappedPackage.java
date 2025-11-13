@@ -1,6 +1,7 @@
 package org.example.datamodel.impl.code.wrapper;
 
 import org.example.datamodel.api.code.IQualifiedName;
+import org.example.datamodel.api.code.wrapper.ICodeObjectRegistry;
 import org.example.datamodel.api.code.wrapper.IPackage;
 import org.example.datamodel.api.code.wrapper.IType;
 
@@ -18,7 +19,7 @@ public abstract class AbstractWrappedPackage<T> extends AbstractWrappedElement<T
     }
 
     @Override
-    public void resolve(CodeObjectRegistry registry) {
+    public void resolve(ICodeObjectRegistry registry) {
         super.resolve(registry);
 
         _subTypes.addAll(resolveSubTypes(registry));
@@ -34,7 +35,7 @@ public abstract class AbstractWrappedPackage<T> extends AbstractWrappedElement<T
     }
 
     // Hook methods providing lib-specific resolution logic
-    protected abstract List<IType> resolveSubTypes(CodeObjectRegistry registry);
+    protected abstract List<IType> resolveSubTypes(ICodeObjectRegistry registry);
 
-    protected abstract List<IPackage> resolveSubPackages(CodeObjectRegistry registry);
+    protected abstract List<IPackage> resolveSubPackages(ICodeObjectRegistry registry);
 }

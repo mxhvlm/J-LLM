@@ -2,7 +2,6 @@ package org.example.datamodel.impl.code.spoon;
 
 import org.example.datamodel.api.code.wrapper.*;
 import org.example.datamodel.impl.code.wrapper.AbstractWrappedMethod;
-import org.example.datamodel.impl.code.wrapper.CodeObjectRegistry;
 import spoon.reflect.code.CtFieldAccess;
 import spoon.reflect.code.CtInvocation;
 import spoon.reflect.declaration.CtMethod;
@@ -19,7 +18,7 @@ public class WrappedCtMethod<T extends CtMethod<?>> extends AbstractWrappedMetho
     }
 
     @Override
-    protected List<String> resolveModifiers(CodeObjectRegistry registry) {
+    protected List<String> resolveModifiers(ICodeObjectRegistry registry) {
         return getWrappedObject().getModifiers()
                 .stream()
                 .map(Enum::name)
@@ -27,7 +26,7 @@ public class WrappedCtMethod<T extends CtMethod<?>> extends AbstractWrappedMetho
     }
 
     @Override
-    protected List<IParameter> resolveParameters(CodeObjectRegistry registry) {
+    protected List<IParameter> resolveParameters(ICodeObjectRegistry registry) {
         return getWrappedObject().getParameters()
                 .stream()
                 .map(parameter -> registry.getRegister(IParameter.class).getOrCreate(
@@ -37,7 +36,7 @@ public class WrappedCtMethod<T extends CtMethod<?>> extends AbstractWrappedMetho
     }
 
     @Override
-    protected List<IType> resolveExceptions(CodeObjectRegistry registry) {
+    protected List<IType> resolveExceptions(ICodeObjectRegistry registry) {
         return getWrappedObject().getThrownTypes()
                 .stream()
                 .map(CtTypeReference::getTypeDeclaration)
@@ -49,7 +48,7 @@ public class WrappedCtMethod<T extends CtMethod<?>> extends AbstractWrappedMetho
     }
 
     @Override
-    protected Optional<IType> resolveReturnType(CodeObjectRegistry registry) {
+    protected Optional<IType> resolveReturnType(ICodeObjectRegistry registry) {
         if (getWrappedObject().getType() != null && getWrappedObject().getType().getTypeDeclaration() != null) {
             return Optional.of(
                     registry.getRegister(IType.class).getOrCreate(
@@ -61,22 +60,22 @@ public class WrappedCtMethod<T extends CtMethod<?>> extends AbstractWrappedMetho
     }
 
     @Override
-    protected String resolveSignature(CodeObjectRegistry registry) {
+    protected String resolveSignature(ICodeObjectRegistry registry) {
         return getWrappedObject().getSignature();
     }
 
     @Override
-    protected String resolveMethodBody(CodeObjectRegistry registry) {
+    protected String resolveMethodBody(ICodeObjectRegistry registry) {
         return getWrappedObject().getBody() != null ? getWrappedObject().getBody().toString() : "";
     }
 
     @Override
-    protected String resolveDocumentation(CodeObjectRegistry registry) {
+    protected String resolveDocumentation(ICodeObjectRegistry registry) {
         return getWrappedObject().getDocComment();
     }
 
     @Override
-    protected List<IMethod> resolveReferencedMethods(CodeObjectRegistry registry) {
+    protected List<IMethod> resolveReferencedMethods(ICodeObjectRegistry registry) {
         return getWrappedObject()
                 .getElements(new TypeFilter<>(CtInvocation.class))
                 .stream()
@@ -95,7 +94,7 @@ public class WrappedCtMethod<T extends CtMethod<?>> extends AbstractWrappedMetho
     }
 
     @Override
-    protected List<IField> resolveReferencedFields(CodeObjectRegistry registry) {
+    protected List<IField> resolveReferencedFields(ICodeObjectRegistry registry) {
         if (getWrappedObject().getBody() == null) {
             return List.of();
         }
