@@ -3,7 +3,7 @@ package org.example.integration.impl.atlassian.jira;
 import org.apache.commons.lang3.NotImplementedException;
 import org.example.integration.api.IApiResponse;
 import org.example.integration.api.projectmanagement.IProjectManagementProvider;
-import org.example.integration.api.projectmanagement.ITicket;
+import org.example.datamodel.projectmanagement.ITicket;
 
 import java.util.List;
 

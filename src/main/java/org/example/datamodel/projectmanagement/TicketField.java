@@ -1,6 +1,4 @@
-package org.example.integration.impl.shared;
-
-import org.example.integration.api.projectmanagement.IField;
+package org.example.datamodel.projectmanagement;
 
 public class TicketField implements IField {
     private final String _name;

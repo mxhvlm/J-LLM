@@ -1,5 +1,6 @@
 package org.example.integration.api.wiki;
 
+import org.example.datamodel.wiki.IWikiPage;
 import org.example.integration.api.IApiResponse;
 
 import java.util.List;

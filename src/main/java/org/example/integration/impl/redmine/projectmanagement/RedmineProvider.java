@@ -4,10 +4,10 @@ import org.example.integration.api.EnumHttpMethod;
 import org.example.integration.api.IApiResponse;
 import org.example.integration.api.ITokenAuthConfig;
 import org.example.integration.api.projectmanagement.IProjectManagementProvider;
-import org.example.integration.api.projectmanagement.ITicket;
+import org.example.datamodel.projectmanagement.ITicket;
 import org.example.integration.impl.ApiResponse;
 import org.example.integration.impl.redmine.RedmineApiRequest;
-import org.example.integration.impl.shared.Ticket;
+import org.example.datamodel.projectmanagement.Ticket;
 import org.slf4j.Logger;
 
 import java.net.URLDecoder;

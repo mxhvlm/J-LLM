@@ -4,11 +4,11 @@ import org.example.integration.api.ITokenAuthConfig;
 import org.example.integration.impl.ApiResponse;
 import org.example.integration.api.EnumHttpMethod;
 import org.example.integration.api.IApiResponse;
-import org.example.integration.api.wiki.IWikiPage;
+import org.example.datamodel.wiki.IWikiPage;
 import org.example.integration.api.wiki.IWikiProvider;
 import org.example.integration.impl.redmine.RedmineApiRequest;
 import org.example.integration.impl.redmine.RedminePaginationDTO;
-import org.example.integration.impl.shared.WikiPage;
+import org.example.datamodel.wiki.WikiPage;
 import org.slf4j.Logger;
 
 import java.net.http.HttpClient;

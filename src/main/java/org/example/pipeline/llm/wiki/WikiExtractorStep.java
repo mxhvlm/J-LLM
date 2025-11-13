@@ -1,6 +1,6 @@
 package org.example.pipeline.llm.wiki;
 
-import org.example.integration.api.wiki.IWikiPage;
+import org.example.datamodel.wiki.IWikiPage;
 import org.example.integration.api.wiki.IWikiProvider;
 import org.example.pipeline.IPipelineStep;
 

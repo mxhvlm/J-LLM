@@ -1,7 +1,4 @@
-package org.example.integration.impl.shared;
-
-import org.example.integration.api.projectmanagement.IField;
-import org.example.integration.api.projectmanagement.ITicket;
+package org.example.datamodel.projectmanagement;
 
 import java.util.HashMap;
 import java.util.Map;

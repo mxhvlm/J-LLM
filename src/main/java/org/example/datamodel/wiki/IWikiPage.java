@@ -1,4 +1,4 @@
-package org.example.integration.api.wiki;
+package org.example.datamodel.wiki;
 
 import java.util.Date;
 

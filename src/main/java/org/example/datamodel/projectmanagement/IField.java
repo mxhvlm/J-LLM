@@ -1,4 +1,4 @@
-package org.example.integration.api.projectmanagement;
+package org.example.datamodel.projectmanagement;
 
 public interface IField {
     String getName();

@@ -1,4 +1,4 @@
-package org.example.integration.api.projectmanagement;
+package org.example.datamodel.projectmanagement;
 
 import java.util.Map;
 import java.util.Optional;
