@@ -2,7 +2,6 @@ package com.mxhvlm.jllm.core.datamodel.impl.code.wrapper;
 
 import com.mxhvlm.jllm.core.datamodel.api.code.IQualifiedName;
 import com.mxhvlm.jllm.core.datamodel.api.code.wrapper.*;
-import org.example.impl.datamodel.api.code.wrapper.*;
 import org.neo4j.driver.internal.shaded.reactor.util.annotation.Nullable;
 
 import java.util.LinkedList;

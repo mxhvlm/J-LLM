@@ -1,9 +1,9 @@
 package com.mxhvlm.jllm.core.integration.impl.atlassian.jira;
 
-import org.apache.commons.lang3.NotImplementedException;
 import com.mxhvlm.jllm.core.datamodel.api.projectmanagement.ITicket;
 import com.mxhvlm.jllm.core.integration.api.IApiResponse;
 import com.mxhvlm.jllm.core.integration.api.projectmanagement.IProjectManagementProvider;
+import org.apache.commons.lang3.NotImplementedException;
 
 import java.util.List;
 

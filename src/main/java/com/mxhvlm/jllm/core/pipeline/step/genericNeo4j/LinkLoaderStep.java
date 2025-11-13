@@ -2,9 +2,9 @@ package com.mxhvlm.jllm.core.pipeline.step.genericNeo4j;
 
 import com.mxhvlm.jllm.core.datamodel.impl.neo4j.Neo4JLink;
 import com.mxhvlm.jllm.core.integration.api.neo4j.INeo4jProvider;
-import com.mxhvlm.jllm.core.pipeline.step.AbstractNeo4jLoaderStep;
 import com.mxhvlm.jllm.core.pipeline.IPipelineStep;
 import com.mxhvlm.jllm.core.pipeline.TransformResult;
+import com.mxhvlm.jllm.core.pipeline.step.AbstractNeo4jLoaderStep;
 import org.slf4j.Logger;
 
 import java.util.List;

@@ -3,9 +3,9 @@ package com.mxhvlm.jllm.core.pipeline.step.code.type;
 import com.mxhvlm.jllm.core.datamodel.impl.neo4j.Neo4JLink;
 import com.mxhvlm.jllm.core.datamodel.impl.neo4j.Neo4jType;
 import com.mxhvlm.jllm.core.integration.api.neo4j.INeo4jProvider;
-import com.mxhvlm.jllm.core.pipeline.step.AbstractNeo4jLoaderStep;
 import com.mxhvlm.jllm.core.pipeline.IPipelineStep;
 import com.mxhvlm.jllm.core.pipeline.TransformResult;
+import com.mxhvlm.jllm.core.pipeline.step.AbstractNeo4jLoaderStep;
 import org.neo4j.driver.Values;
 
 import java.util.ArrayList;

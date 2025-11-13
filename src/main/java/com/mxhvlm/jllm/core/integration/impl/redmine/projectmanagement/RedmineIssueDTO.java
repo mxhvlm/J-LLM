@@ -1,9 +1,9 @@
 package com.mxhvlm.jllm.core.integration.impl.redmine.projectmanagement;
 
-import org.apache.commons.lang3.NotImplementedException;
 import com.mxhvlm.jllm.core.datamodel.api.projectmanagement.IField;
 import com.mxhvlm.jllm.core.datamodel.api.projectmanagement.ITicket;
 import com.mxhvlm.jllm.core.datamodel.impl.projectmanagement.TicketField;
+import org.apache.commons.lang3.NotImplementedException;
 
 import java.util.Date;
 import java.util.Map;

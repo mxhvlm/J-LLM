@@ -1,9 +1,9 @@
 package com.mxhvlm.jllm.core.integration.impl.atlassian.confluence;
 
-import org.apache.commons.lang3.NotImplementedException;
 import com.mxhvlm.jllm.core.datamodel.api.wiki.IWikiPage;
 import com.mxhvlm.jllm.core.integration.api.IApiResponse;
 import com.mxhvlm.jllm.core.integration.api.wiki.IWikiProvider;
+import org.apache.commons.lang3.NotImplementedException;
 
 import java.util.List;
 

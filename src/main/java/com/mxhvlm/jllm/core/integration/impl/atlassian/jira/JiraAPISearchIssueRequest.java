@@ -1,8 +1,8 @@
 package com.mxhvlm.jllm.core.integration.impl.atlassian.jira;
 
-import org.apache.commons.lang3.NotImplementedException;
 import com.mxhvlm.jllm.core.integration.api.IApiRequest;
 import com.mxhvlm.jllm.core.integration.api.IApiResponse;
+import org.apache.commons.lang3.NotImplementedException;
 
 import java.net.URI;
 import java.net.http.HttpClient;

@@ -1,7 +1,6 @@
 package com.mxhvlm.jllm.core.datamodel.impl.code.spoon;
 
 import com.mxhvlm.jllm.core.datamodel.api.code.wrapper.*;
-import org.example.impl.datamodel.api.code.wrapper.*;
 import com.mxhvlm.jllm.core.datamodel.impl.code.wrapper.AbstractWrappedMethod;
 import spoon.reflect.code.CtFieldAccess;
 import spoon.reflect.code.CtInvocation;

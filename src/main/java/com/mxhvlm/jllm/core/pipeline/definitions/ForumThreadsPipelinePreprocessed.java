@@ -3,8 +3,8 @@ package com.mxhvlm.jllm.core.pipeline.definitions;
 import com.mxhvlm.jllm.core.datamodel.api.knowledge.ProcessedForumThread;
 import com.mxhvlm.jllm.core.integration.api.neo4j.INeo4jProvider;
 import com.mxhvlm.jllm.core.pipeline.IPipelineStep;
-import com.mxhvlm.jllm.core.pipeline.step.JsonExtractorStep;
 import com.mxhvlm.jllm.core.pipeline.Pipeline;
+import com.mxhvlm.jllm.core.pipeline.step.JsonExtractorStep;
 import com.mxhvlm.jllm.core.pipeline.step.llm.forumThreads.LoadStepPreprocessed;
 import com.mxhvlm.jllm.core.pipeline.step.llm.forumThreads.TransformStepPreprocessed;
 

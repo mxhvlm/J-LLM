@@ -1,6 +1,5 @@
 package com.mxhvlm.jllm.core.pipeline.definitions;
 
-import com.mxhvlm.jllm.core.pipeline.step.code.method.LoadStep;
 import com.mxhvlm.jllm.core.JLLMConfig;
 import com.mxhvlm.jllm.core.datamodel.impl.code.CodeModel;
 import com.mxhvlm.jllm.core.datamodel.impl.code.spoon.SpoonModelBuilder;
@@ -10,6 +9,7 @@ import com.mxhvlm.jllm.core.pipeline.TransformResult;
 import com.mxhvlm.jllm.core.pipeline.step.code._package.ExtractorStep;
 import com.mxhvlm.jllm.core.pipeline.step.code._package.LoaderStep;
 import com.mxhvlm.jllm.core.pipeline.step.code._package.TransformerStep;
+import com.mxhvlm.jllm.core.pipeline.step.code.method.LoadStep;
 
 public class SpoonExtractorStep extends AbstractNeo4jMetaStep {
 
