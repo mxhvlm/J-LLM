@@ -1,9 +1,8 @@
 package org.example.pipeline.code.type;
 
-import org.example.datamodel.neo4j.Neo4JLink;
-import org.example.datamodel.neo4j.Neo4jType;
+import org.example.datamodel.impl.neo4j.Neo4JLink;
+import org.example.datamodel.impl.neo4j.Neo4jType;
 import org.example.integration.api.neo4j.INeo4jProvider;
-import org.example.integration.impl.neo4j.Neo4jProvider;
 import org.example.pipeline.AbstractNeo4jLoaderStep;
 import org.example.pipeline.IPipelineStep;
 import org.example.pipeline.TransformResult;

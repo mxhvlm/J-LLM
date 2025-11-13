@@ -1,12 +1,10 @@
 package org.example.pipeline.code.method;
 
-import org.example.datamodel.code.wrapper.IMethod;
-import org.example.datamodel.code.wrapper.IType;
+import org.example.datamodel.api.code.wrapper.IMethod;
+import org.example.datamodel.api.code.wrapper.IType;
 import org.example.pipeline.IPipelineStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import spoon.reflect.declaration.CtMethod;
-import spoon.reflect.declaration.CtType;
 
 import java.util.Collection;
 import java.util.stream.Stream;

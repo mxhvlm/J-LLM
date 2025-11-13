@@ -1,11 +1,10 @@
 package org.example.pipeline.llm;
 
-import org.example.datamodel.knowledge.PreprocessedMethodAnalysis;
-import org.example.datamodel.neo4j.Neo4JLink;
-import org.example.datamodel.neo4j.Neo4jExplanation;
-import org.example.datamodel.neo4j.Neo4jSummary;
+import org.example.datamodel.api.knowledge.PreprocessedMethodAnalysis;
+import org.example.datamodel.impl.neo4j.Neo4JLink;
+import org.example.datamodel.impl.neo4j.Neo4jExplanation;
+import org.example.datamodel.impl.neo4j.Neo4jSummary;
 import org.example.integration.api.neo4j.INeo4jProvider;
-import org.example.integration.impl.neo4j.Neo4jProvider;
 import org.example.pipeline.IPipelineStep;
 import org.example.pipeline.JsonExtractorStep;
 import org.example.pipeline.Pipeline;

@@ -1,13 +1,11 @@
 package org.example.pipeline.code.type;
 
-import org.example.datamodel.code.CodeModel;
-import org.example.datamodel.code.wrapper.IType;
+import org.example.datamodel.impl.code.CodeModel;
+import org.example.datamodel.api.code.wrapper.IType;
 import org.example.pipeline.IPipelineStep;
 import org.slf4j.Logger;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.stream.Stream;
 
 public class ExtractorStep implements IPipelineStep<CodeModel, Stream<IType>> {

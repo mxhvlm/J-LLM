@@ -1,6 +1,6 @@
 package org.example.pipeline.meta;
 
-import org.example.datamodel.code.CodeModel;
+import org.example.datamodel.impl.code.CodeModel;
 import org.example.JLLMConfig;
 import org.example.integration.api.neo4j.INeo4jProvider;
 import org.example.pipeline.Pipeline;
@@ -8,7 +8,7 @@ import org.example.pipeline.TransformResult;
 import org.example.pipeline.code._package.ExtractorStep;
 import org.example.pipeline.code._package.LoaderStep;
 import org.example.pipeline.code._package.TransformerStep;
-import org.example.datamodel.code.impl.spoon.SpoonModelBuilder;
+import org.example.datamodel.impl.code.spoon.SpoonModelBuilder;
 
 public class SpoonExtractorStep extends AbstractNeo4jMetaStep {
 

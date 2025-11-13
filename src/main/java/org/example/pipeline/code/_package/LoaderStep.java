@@ -1,6 +1,6 @@
 package org.example.pipeline.code._package;
 
-import org.example.datamodel.neo4j.Neo4jPackage;
+import org.example.datamodel.impl.neo4j.Neo4jPackage;
 import org.example.integration.api.neo4j.INeo4jProvider;
 import org.example.pipeline.AbstractNeo4jLoaderStep;
 import org.example.pipeline.IPipelineStep;

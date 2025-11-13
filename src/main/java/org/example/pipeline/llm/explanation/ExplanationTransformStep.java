@@ -1,8 +1,8 @@
 package org.example.pipeline.llm.explanation;
 
-import org.example.datamodel.neo4j.Neo4JLink;
-import org.example.datamodel.neo4j.Neo4jExplanation;
-import org.example.datamodel.neo4j.Neo4jMethodSummaryContextResult;
+import org.example.datamodel.impl.neo4j.Neo4JLink;
+import org.example.datamodel.impl.neo4j.Neo4jExplanation;
+import org.example.datamodel.impl.neo4j.Neo4jMethodSummaryContextResult;
 import org.example.integration.api.llm.ILLMProvider;
 import org.example.integration.api.llm.LLMConfig;
 import org.example.pipeline.llm.AbstractLLMTransformStep;

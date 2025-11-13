@@ -1,6 +1,6 @@
 package org.example.integration.api.projectmanagement;
 
-import org.example.datamodel.projectmanagement.ITicket;
+import org.example.datamodel.api.projectmanagement.ITicket;
 import org.example.integration.api.IApiResponse;
 
 import java.util.List;

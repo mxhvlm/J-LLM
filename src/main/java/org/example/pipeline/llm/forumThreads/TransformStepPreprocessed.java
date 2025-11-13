@@ -1,13 +1,12 @@
 package org.example.pipeline.llm.forumThreads;
 
 import com.google.gson.Gson;
-import org.example.datamodel.knowledge.ProcessedForumThread;
-import org.example.datamodel.neo4j.Neo4JLink;
-import org.example.datamodel.neo4j.Neo4jForumThread;
-import org.example.datamodel.neo4j.Neo4jForumThreadTag;
-import org.example.datamodel.neo4j.Neo4jType;
+import org.example.datamodel.api.knowledge.ProcessedForumThread;
+import org.example.datamodel.impl.neo4j.Neo4JLink;
+import org.example.datamodel.impl.neo4j.Neo4jForumThread;
+import org.example.datamodel.impl.neo4j.Neo4jForumThreadTag;
+import org.example.datamodel.impl.neo4j.Neo4jType;
 import org.example.integration.api.neo4j.INeo4jProvider;
-import org.example.integration.impl.neo4j.Neo4jProvider;
 import org.example.pipeline.IPipelineStep;
 import org.neo4j.driver.Values;
 import org.neo4j.driver.types.Node;

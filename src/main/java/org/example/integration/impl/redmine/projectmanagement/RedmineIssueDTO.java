@@ -1,9 +1,9 @@
 package org.example.integration.impl.redmine.projectmanagement;
 
 import org.apache.commons.lang3.NotImplementedException;
-import org.example.datamodel.projectmanagement.IField;
-import org.example.datamodel.projectmanagement.ITicket;
-import org.example.datamodel.projectmanagement.TicketField;
+import org.example.datamodel.api.projectmanagement.IField;
+import org.example.datamodel.api.projectmanagement.ITicket;
+import org.example.datamodel.impl.projectmanagement.TicketField;
 
 import java.util.Date;
 import java.util.Map;

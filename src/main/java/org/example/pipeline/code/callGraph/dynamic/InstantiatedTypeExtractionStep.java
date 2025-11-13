@@ -2,7 +2,7 @@ package org.example.pipeline.code.callGraph.dynamic;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.tuple.Pair;
-import org.example.datamodel.code.CodeModel;
+import org.example.datamodel.impl.code.CodeModel;
 import org.example.pipeline.IPipelineStep;
 import spoon.reflect.reference.CtExecutableReference;
 import spoon.reflect.reference.CtTypeReference;

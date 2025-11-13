@@ -1,0 +1,7 @@
+package org.example.datamodel.api.code.wrapper;
+
+import java.util.Optional;
+
+public interface IParameter extends INamedElement {
+    Optional<IType> getType();
+}

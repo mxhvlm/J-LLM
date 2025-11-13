@@ -1,18 +1,17 @@
 package org.example.pipeline.code.method;
 
-import org.example.datamodel.code.QualifiedName;
-import org.example.datamodel.code.wrapper.*;
-import org.example.datamodel.neo4j.Neo4JLink;
-import org.example.datamodel.neo4j.Neo4jMethod;
-import org.example.datamodel.neo4j.Neo4jParam;
-import org.example.datamodel.neo4j.Neo4jTypeArgument;
+import org.example.datamodel.api.code.IQualifiedName;
+import org.example.datamodel.api.code.wrapper.IMethod;
+import org.example.datamodel.api.code.wrapper.INamedElement;
+import org.example.datamodel.api.code.wrapper.IParameter;
+import org.example.datamodel.api.code.wrapper.IType;
+import org.example.datamodel.impl.neo4j.Neo4JLink;
+import org.example.datamodel.impl.neo4j.Neo4jMethod;
+import org.example.datamodel.impl.neo4j.Neo4jParam;
+import org.example.datamodel.impl.neo4j.Neo4jTypeArgument;
 import org.example.pipeline.IPipelineStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import spoon.reflect.code.CtFieldAccess;
-import spoon.reflect.declaration.*;
-import spoon.reflect.reference.CtFieldReference;
-import spoon.reflect.reference.CtTypeReference;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -34,7 +33,7 @@ public class TransformerStep implements IPipelineStep<Stream<IMethod>, Stream<Tr
             .map(m -> {
                 String declaringTypeName = m.getDeclaringType()
                         .map(IType::getName)
-                        .map(QualifiedName::getQualifiedName)
+                        .map(IQualifiedName::getQualifiedName)
                         .orElse("ERROR");
                 String methodSignature = m.getSignature();
                 String modifiers = String.join(",", m.getModifiers());
@@ -82,7 +81,7 @@ public class TransformerStep implements IPipelineStep<Stream<IMethod>, Stream<Tr
     private IMethodTransformerOutput createParentLink(IMethod method) {
             String declaringTypeName = method.getDeclaringType()
                     .map(IType::getName)
-                    .map(QualifiedName::getQualifiedName)
+                    .map(IQualifiedName::getQualifiedName)
                     .orElse("ERROR");
 
             String methodSignature = method.getSignature();
@@ -151,14 +150,14 @@ public class TransformerStep implements IPipelineStep<Stream<IMethod>, Stream<Tr
     private List<IMethodTransformerOutput> createReturnTypeLink(IMethod method) throws Exception {
         String declaringTypeName = method.getDeclaringType()
                 .map(IType::getName)
-                .map(QualifiedName::getQualifiedName)
+                .map(IQualifiedName::getQualifiedName)
                 .orElse("ERROR");
 
         String methodSignature = method.getSignature();
 
         String returnTypeName = method.getReturnType()
                 .map(IType::getName)
-                .map(QualifiedName::getQualifiedName)
+                .map(IQualifiedName::getQualifiedName)
                 .orElseThrow(() -> new Exception("Return type for method " + declaringTypeName + "#" + methodSignature + " is null"));
 
         LOGGER.trace("Linking method {}#{} returns {}", declaringTypeName, methodSignature, returnTypeName);
@@ -182,7 +181,7 @@ public class TransformerStep implements IPipelineStep<Stream<IMethod>, Stream<Tr
     private List<IMethodTransformerOutput> createParameterLinks(IMethod method, IParameter parameter) {
         String declaringTypeName = method.getDeclaringType()
                 .map(IType::getName)
-                .map(QualifiedName::getQualifiedName)
+                .map(IQualifiedName::getQualifiedName)
                 .orElse("ERROR");
 
         String methodSignature = method.getSignature();
@@ -203,7 +202,7 @@ public class TransformerStep implements IPipelineStep<Stream<IMethod>, Stream<Tr
 
         String paramTypeName = parameter.getType()
                 .map(IType::getName)
-                .map(QualifiedName::getQualifiedName)
+                .map(IQualifiedName::getQualifiedName)
                 .orElse("ERROR");
 
         Neo4JLink paramTypeLink = Neo4JLink.Builder.create()
@@ -229,7 +228,7 @@ public class TransformerStep implements IPipelineStep<Stream<IMethod>, Stream<Tr
     private List<IMethodTransformerOutput> createFieldDepLinks(IMethod method) {
         String declaringTypeName = method.getDeclaringType()
                 .map(IType::getName)
-                .map(QualifiedName::getQualifiedName)
+                .map(IQualifiedName::getQualifiedName)
                 .orElse("ERROR");
 
         String methodSignature = method.getSignature();

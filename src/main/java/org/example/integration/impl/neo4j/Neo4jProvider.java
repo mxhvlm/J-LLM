@@ -1,6 +1,6 @@
 package org.example.integration.impl.neo4j;
 
-import org.example.datamodel.neo4j.Neo4JLink;
+import org.example.datamodel.impl.neo4j.Neo4JLink;
 import org.example.integration.api.neo4j.INeo4jProvider;
 import org.neo4j.driver.*;
 import org.slf4j.Logger;

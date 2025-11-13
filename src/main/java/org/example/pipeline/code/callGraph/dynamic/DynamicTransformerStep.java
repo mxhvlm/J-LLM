@@ -1,8 +1,8 @@
 package org.example.pipeline.code.callGraph.dynamic;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.example.datamodel.neo4j.Neo4JLink;
-import org.example.datamodel.neo4j.Neo4JLink.Builder;
+import org.example.datamodel.impl.neo4j.Neo4JLink;
+import org.example.datamodel.impl.neo4j.Neo4JLink.Builder;
 import org.example.pipeline.IPipelineStep;
 import org.slf4j.Logger;
 import spoon.reflect.code.CtInvocation;

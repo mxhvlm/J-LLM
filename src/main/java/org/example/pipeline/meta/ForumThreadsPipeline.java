@@ -1,7 +1,7 @@
 package org.example.pipeline.meta;
 
 import com.google.gson.JsonParser;
-import org.example.datamodel.knowledge.ProcessedForumThread;
+import org.example.datamodel.api.knowledge.ProcessedForumThread;
 import org.example.integration.api.llm.ILLMProvider;
 import org.example.integration.api.llm.LLMConfig;
 import org.example.integration.api.neo4j.INeo4jProvider;

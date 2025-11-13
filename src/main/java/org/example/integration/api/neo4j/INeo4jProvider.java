@@ -1,6 +1,6 @@
 package org.example.integration.api.neo4j;
 
-import org.example.datamodel.neo4j.Neo4JLink;
+import org.example.datamodel.impl.neo4j.Neo4JLink;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.Result;
 import org.neo4j.driver.Value;

@@ -1,9 +1,9 @@
 package org.example.pipeline.code.type;
 
-import org.example.datamodel.code.wrapper.EnumTypeKind;
-import org.example.datamodel.code.wrapper.IType;
-import org.example.datamodel.neo4j.Neo4JLink;
-import org.example.datamodel.neo4j.Neo4jType;
+import org.example.datamodel.api.code.wrapper.EnumTypeKind;
+import org.example.datamodel.api.code.wrapper.IType;
+import org.example.datamodel.impl.neo4j.Neo4JLink;
+import org.example.datamodel.impl.neo4j.Neo4jType;
 import org.example.pipeline.IPipelineStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

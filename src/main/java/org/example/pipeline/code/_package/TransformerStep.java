@@ -1,7 +1,7 @@
 package org.example.pipeline.code._package;
 
-import org.example.datamodel.neo4j.Neo4JLink;
-import org.example.datamodel.neo4j.Neo4jPackage;
+import org.example.datamodel.impl.neo4j.Neo4JLink;
+import org.example.datamodel.impl.neo4j.Neo4jPackage;
 import org.example.pipeline.IPipelineStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

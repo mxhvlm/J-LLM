@@ -1,10 +1,10 @@
 package org.example.pipeline.code.field;
 
-import org.example.datamodel.code.wrapper.IField;
-import org.example.datamodel.code.wrapper.INamedElement;
-import org.example.datamodel.code.wrapper.IType;
-import org.example.datamodel.neo4j.Neo4JLink;
-import org.example.datamodel.neo4j.Neo4jField;
+import org.example.datamodel.api.code.wrapper.IField;
+import org.example.datamodel.api.code.wrapper.INamedElement;
+import org.example.datamodel.api.code.wrapper.IType;
+import org.example.datamodel.impl.neo4j.Neo4JLink;
+import org.example.datamodel.impl.neo4j.Neo4jField;
 import org.example.pipeline.IPipelineStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
