@@ -4,6 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spoon.reflect.declaration.CtMethod;
 
+/**
+ * @deprecated 
+ */
 class SourceCodePrinter {
     private static final Logger LOGGER = LoggerFactory.getLogger(SourceCodePrinter.class);
 

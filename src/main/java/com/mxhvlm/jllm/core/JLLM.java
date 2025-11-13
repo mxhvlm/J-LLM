@@ -17,7 +17,6 @@ import com.mxhvlm.jllm.core.pipeline.definitions.WikiPipeline;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 public class JLLM implements Runnable {
     public static final Logger LOGGER = LoggerFactory.getLogger(JLLM.class);
     private final JLLMConfig _config;
@@ -28,6 +27,7 @@ public class JLLM implements Runnable {
         _config = new JLLMConfig();
 
         ILLMProvider llmProvider = new OpenAIProvider(readOpenAIConfig());
+
         ILLMConfig explanationConfig = LLMConfig.Builder.defaultConfig()
                 .withContextLength(16384)
                 .withModel("gpt-3.5-turbo")

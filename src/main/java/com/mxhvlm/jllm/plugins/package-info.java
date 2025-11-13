@@ -1,4 +1,4 @@
-package com.mxhvlm.plugins;
+package com.mxhvlm.jllm.plugins;
 
 /**
  * Package to temporarily hold plugins for specific pipelines

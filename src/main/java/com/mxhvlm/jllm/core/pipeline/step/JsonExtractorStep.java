@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
 import com.mxhvlm.jllm.core.pipeline.IPipelineStep;
+import org.neo4j.driver.internal.shaded.reactor.util.annotation.Nullable;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -18,8 +19,9 @@ public class JsonExtractorStep<T> implements IPipelineStep<Integer, Stream<T>> {
     private final String _filePath;
 
     // Optional cursor and batch size
-    private final Integer _cursor;
-    private final Integer _batchSize;
+    //TODO: Create separate batched extractor
+    private final @Nullable Integer _cursor;
+    private final @Nullable Integer _batchSize;
 
     // Original constructor (full array)
     public JsonExtractorStep(Class<T> targetType, String filePath) {
