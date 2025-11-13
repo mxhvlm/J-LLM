@@ -10,6 +10,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.HashMap;
 import java.util.Objects;
 
 class RedmineApiRequest implements IApiRequest {
@@ -20,17 +21,30 @@ class RedmineApiRequest implements IApiRequest {
     private final EnumHttpMethod _method;
     private final boolean _isPaginated;
     private int _offset;
-    private final int _limit = 100;
+    private final int _limit;
     private final Gson _gson;
+    private final HashMap<Object, Object> _params;
 
-    private RedmineApiRequest(RedmineApiConfig config, String endpoint, EnumRedmineContentType contentType, JsonObject body, EnumHttpMethod method, boolean isPaginated) {
+    private RedmineApiRequest(
+            RedmineApiConfig config,
+            String endpoint,
+            EnumRedmineContentType contentType,
+            JsonObject body,
+            EnumHttpMethod method,
+            boolean isPaginated,
+            int offset,
+            int limit,
+            HashMap<Object, Object> params) {
         _config = config;
         _endpoint = endpoint;
         _contentType = contentType;
         _body = body;
         _method = method;
         _isPaginated = isPaginated;
+        _params = params;
         _gson = new Gson();
+        _offset = offset;
+        _limit = limit;
     }
 
     private JsonObject toJson() {
@@ -62,27 +76,14 @@ class RedmineApiRequest implements IApiRequest {
                         return ApiResponse.failure(String.format("Request failed with status code %d: %s", response.statusCode(), response.body()));
                     }
 
-                    /*
-                    Response looking like this:
-                        GET /issues.json
-                        { "issues":[...], "total_count":2595, "limit":25, "offset":0 }
-                    Due to the array being named after the endpoint, we cannot generically extract it by name.
-                    Instead we simply get the first array in the response.
-                     */
-                    JsonObject json = JsonParser.parseString(response.body()).getAsJsonObject();
-                    int totalCount = json.get("total_count").getAsInt();
-                    JsonArray items = json.entrySet().stream()
-                            .filter(e -> e.getValue().isJsonArray())
-                            .map(e -> e.getValue().getAsJsonArray())
-                            .findFirst()
-                            .orElse(new JsonArray());
+                    RedminePaginationDTO responseDto = _gson.fromJson(response.body(), RedminePaginationDTO.class);
 
-                    allItems.addAll(items);
+                    allItems.addAll(responseDto.items());
 
-                    if (_offset + _limit >= totalCount) {
+                    if (_offset + _limit >= responseDto.total_count()) { //TODO: Properly implement totalCount
                         return ApiResponse.success(_gson.fromJson(allItems, clazz)); // Deserialize to ensure type correctness
                     } else {
-                        _offset += _limit;
+                        _offset += responseDto.limit();
                     }
                 }
             } catch (JsonSyntaxException ex) {
@@ -107,9 +108,27 @@ class RedmineApiRequest implements IApiRequest {
 
     @Override
     public URI getUri() {
-        return _isPaginated
-                ? URI.create(_config.baseUrl() + _endpoint + "?offset=" + _offset + "&limit=" + _limit)
-                : URI.create(_config.baseUrl() + _endpoint);
+        StringBuilder uriBuilder = new StringBuilder();
+        uriBuilder.append(_config.baseUrl());
+        if (!uriBuilder.toString().endsWith("/") && !_endpoint.startsWith("/")) {
+            uriBuilder.append("/");
+        }
+        uriBuilder.append(_endpoint);
+
+        if (_isPaginated || !_params.isEmpty()) {
+            uriBuilder.append("?");
+            if (_isPaginated) {
+                uriBuilder.append("offset=").append(_offset).append("&limit=").append(_limit);
+            }
+            for (var entry : _params.entrySet()) {
+                if (uriBuilder.charAt(uriBuilder.length() - 1) != '?') {
+                    uriBuilder.append("&");
+                }
+                uriBuilder.append(entry.getKey()).append("=").append(entry.getValue());
+            }
+        }
+
+        return URI.create(uriBuilder.toString());
     }
 
     static class Builder {
@@ -119,6 +138,9 @@ class RedmineApiRequest implements IApiRequest {
         private JsonObject _body = new JsonObject();
         private EnumHttpMethod _method = EnumHttpMethod.GET;
         private boolean _isPaginated = false;
+        private int _offset = 0;
+        private int _limit = 100;
+        private HashMap<Object, Object> _params = new HashMap<>();
 
         public static Builder create() {
             return new Builder();
@@ -144,6 +166,22 @@ class RedmineApiRequest implements IApiRequest {
             return this;
         }
 
+        public Builder withPaginationOffset(int offset) {
+            _offset = offset;
+            return this;
+        }
+
+        public Builder withParams(HashMap<Object, Object> params) {
+            _params.clear();
+            _params.putAll(params);
+            return this;
+        }
+
+        public Builder withPaginationLimit(int limit) {
+            _limit = limit;
+            return this;
+        }
+
         public Builder withBody(JsonObject body) {
             _body = body;
             return this;
@@ -160,7 +198,7 @@ class RedmineApiRequest implements IApiRequest {
             Objects.requireNonNull(_endpoint, "Endpoint is required");
             Objects.requireNonNull(_method, "HttpMethod is required");
 
-            return new RedmineApiRequest(_config, _endpoint, _contentType, _body, _method, _isPaginated);
+            return new RedmineApiRequest(_config, _endpoint, _contentType, _body, _method, _isPaginated, _offset, _limit, _params);
         }
     }
 }

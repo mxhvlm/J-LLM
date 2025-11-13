@@ -11,9 +11,7 @@ import spoon.reflect.declaration.*;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class SpoonModelBuilder implements IModelBuilder {
     private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(SpoonModelBuilder.class);
@@ -64,35 +62,6 @@ public class SpoonModelBuilder implements IModelBuilder {
             .map(p -> _objectRegistry.getRegister(IPackage.class).getOrCreate(QualifiedNameFactory.fromCtElement(p), () -> new WrappedCtPackage(p)))
             .toList();
     }
-
-//    private List<IField> getFields(SpoonAPI spoon) {
-//        return getTypes(spoon)
-//                .stream()
-//                .flatMap(type -> type.getFields().stream())
-//                .toList();
-//    }
-//
-//    private List<IType> getTypes(SpoonAPI spoon) {
-//        return spoon.getModel()
-//            .getAllTypes()
-//            .stream()
-//            .map(t -> _objectRegistry.getRegister(IType.class).getOrCreate(QualifiedNameFactory.fromCtElement(t), () -> new WrappedCtType(t)))
-//            .toList();
-//    }
-//
-//    private List<IMethod> getMethods(SpoonAPI spoon) {
-//        return getTypes(spoon)
-//            .stream()
-//            .flatMap(type -> type.getMethods().stream())
-//            .toList();
-//    }
-//
-//    private List<IParameter> getParameters(SpoonAPI spoon) {
-//        return getMethods(spoon)
-//            .stream()
-//            .flatMap(method -> method.getParameters().stream())
-//            .toList();
-//    }
 
     private List<IType> getInstantiatedTypes(SpoonAPI spoon) {
         throw new NotImplementedException("getInstantiatedTypes() is not implemented yet. Please implement this method to retrieve instantiated types from the Spoon model.");

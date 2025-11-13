@@ -23,4 +23,9 @@ public class ConfluenceProvider implements IWikiProvider {
     public IApiResponse<List<WikiPage>> getAllPages(String projectName) {
         throw new NotImplementedException();
     }
+
+    @Override
+    public IApiResponse<List<String>> getPageTitlesPaginated(String projectName, int offset, int limit) {
+        return null;
+    }
 }

@@ -42,6 +42,18 @@ public class RedmineProvider implements IWikiProvider {
     }
 
     @Override
+    public IApiResponse<Integer> getNumPages(String projectName) {
+        _LOGGER.info("Fetching number of wiki pages for project: {}", projectName);
+        return RedmineApiRequest.Builder.create()
+                .withConfig(_apiConfig)
+                .withMethod(EnumHttpMethod.GET)
+                .withEndpoint("/projects/" + projectName + "/wiki/index.json")
+                .build()
+                .getResponse(_httpClient, RedminePaginationDTO.class)
+                .map(dto -> ApiResponse.success(dto.total_count()), ApiResponse::failure);
+    }
+
+    @Override
     public IApiResponse<WikiPage> getPageContent(String projectName, String pageTitle) {
         _LOGGER.info("Fetching wiki page '{}' for project: {}", pageTitle, projectName);
 
@@ -53,6 +65,9 @@ public class RedmineProvider implements IWikiProvider {
                 .getResponse(_httpClient, RedminePageContentDTO.class)
                 .map(dto -> {
                     _LOGGER.info("Received response for page '{}': {}", pageTitle, dto.text());
+
+                    // Return a generic WikiPage object instead of the RedminePageContentDTO so we decouple the pipelines
+                    // from the Redmine-specific implementation
                     return ApiResponse.success(
                             new WikiPage(
                                 dto.title(),
@@ -95,5 +110,51 @@ public class RedmineProvider implements IWikiProvider {
                     .map(Optional::get)
                     .toList());
         }, ApiResponse::failure);
+    }
+
+    @Override
+    public IApiResponse<List<String>> getPageTitlesPaginated(String projectName, int offset, int limit) {
+        return RedmineApiRequest.Builder.create()
+                .withPaginationOffset(offset)
+                .withPaginationLimit(limit)
+                .withConfig(_apiConfig)
+                .withMethod(EnumHttpMethod.GET)
+                .withPagination()
+                .build()
+                .getResponse(_httpClient, RedminePageListDTO.class)
+                .map(dto ->
+                    ApiResponse.success(dto.wiki_pages().stream().map(RedminePageListDTO.RedminePageListObjectDTO::title).toList()),
+                        ApiResponse::failure);
+    }
+
+    @Override
+    public IApiResponse<List<WikiPage>> getPageContentPaginated(String projectName, int offset, int limit) {
+        return getPageTitlesPaginated(projectName, offset, limit)
+                .map(pageTitles -> {
+                    List<IApiResponse<WikiPage>> pageResponses = pageTitles.stream()
+                            .map(title -> getPageContent(projectName, title))
+                            .toList();
+
+                    // Handle any failures while getting the page contents
+                    if (pageResponses.stream().anyMatch(IApiResponse::isFailure)) {
+                        String errorMessages = pageResponses.stream()
+                                .filter(IApiResponse::isFailure)
+                                .map(IApiResponse::getErrorMessage)
+                                .filter(Optional::isPresent)
+                                .map(Optional::get)
+                                .reduce((msg1, msg2) -> msg1 + "; " + msg2)
+                                .orElse("Unknown error");
+                        _LOGGER.error("Errors occurred while fetching wiki pages: {}", errorMessages);
+                        return ApiResponse.failure("Failed to fetch some wiki pages: " + errorMessages);
+                    }
+
+                    // All page fetches were successful, return the list of WikiPage objects
+                    return ApiResponse.success(pageResponses
+                            .stream()
+                            .map(IApiResponse::getResponse)
+                            .filter(Optional::isPresent)
+                            .map(Optional::get)
+                            .toList());
+                }, ApiResponse::failure);
     }
 }

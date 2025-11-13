@@ -81,8 +81,7 @@ public class ExplanationSummaryPreprocessedPipeline implements IPipelineStep<Neo
           });
 
           return ret.stream();
-        })
-        .then(input12 -> {
+        }).then(input12 -> {
           Map<Boolean, List<IExplanationPreprocessedOutput>> partitions = input12.collect(
               Collectors.partitioningBy(i -> i instanceof Link));
 
