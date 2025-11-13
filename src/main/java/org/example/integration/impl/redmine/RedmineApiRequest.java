@@ -1,11 +1,14 @@
 package org.example.integration.impl.redmine;
 
-import com.google.gson.*;
-import org.example.integration.api.ITokenAuthConfig;
-import org.example.integration.impl.ApiResponse;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 import org.example.integration.api.EnumHttpMethod;
 import org.example.integration.api.IApiRequest;
 import org.example.integration.api.IApiResponse;
+import org.example.integration.api.ITokenAuthConfig;
+import org.example.integration.impl.ApiResponse;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -22,10 +25,10 @@ public class RedmineApiRequest implements IApiRequest {
     private final JsonObject _body;
     private final EnumHttpMethod _method;
     private final boolean _isPaginated;
-    private int _offset;
     private final int _limit;
     private final Gson _gson;
     private final Map<String, String> _params;
+    private int _offset;
 
     private RedmineApiRequest(
             ITokenAuthConfig config,
@@ -135,6 +138,7 @@ public class RedmineApiRequest implements IApiRequest {
     }
 
     public static class Builder {
+        private final Map<String, String> _params = new HashMap<>();
         private ITokenAuthConfig _config;
         private String _endpoint;
         private EnumRedmineContentType _contentType = EnumRedmineContentType.JSON;
@@ -143,7 +147,6 @@ public class RedmineApiRequest implements IApiRequest {
         private boolean _isPaginated = false;
         private int _offset = 0;
         private int _limit = 100;
-        private final Map<String, String> _params = new HashMap<>();
 
         public static Builder create() {
             return new Builder();

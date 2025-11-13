@@ -6,6 +6,7 @@ import spoon.reflect.declaration.CtMethod;
 
 class SourceCodePrinter {
     private static final Logger LOGGER = LoggerFactory.getLogger(SourceCodePrinter.class);
+
     public static String printMethodSource(CtMethod<?> ctMethod) {
         try {
 //            // Get the environment from the factory

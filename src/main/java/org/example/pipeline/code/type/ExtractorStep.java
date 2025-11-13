@@ -1,7 +1,7 @@
 package org.example.pipeline.code.type;
 
-import org.example.datamodel.impl.code.CodeModel;
 import org.example.datamodel.api.code.wrapper.IType;
+import org.example.datamodel.impl.code.CodeModel;
 import org.example.pipeline.IPipelineStep;
 import org.slf4j.Logger;
 

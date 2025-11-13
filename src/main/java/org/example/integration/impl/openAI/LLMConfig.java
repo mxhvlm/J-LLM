@@ -1,23 +1,25 @@
-package org.example.integration.api.llm;
+package org.example.integration.impl.openAI;
+
+import org.example.integration.api.llm.ILLMConfig;
 
 public record LLMConfig(
-    String model,
-    int contextLength,
-    double temperature,
-    int topK,
-    double topP,
-    int maxTokens
-) {
+        String model,
+        int contextLength,
+        double temperature,
+        int topK,
+        double topP,
+        int maxTokens
+) implements ILLMConfig {
     @Override
     public String toString() {
         return "LLMConfig{" +
-            "model='" + model + '\'' +
-            ", contextLength=" + contextLength +
-            ", temperature=" + temperature +
-            ", topK=" + topK +
-            ", topP=" + topP +
-            ", maxTokens=" + maxTokens +
-            '}';
+                "model='" + model + '\'' +
+                ", contextLength=" + contextLength +
+                ", temperature=" + temperature +
+                ", topK=" + topK +
+                ", topP=" + topP +
+                ", maxTokens=" + maxTokens +
+                '}';
     }
 
     public static class Builder {
@@ -28,7 +30,28 @@ public record LLMConfig(
         private double topP = 0.9;
         private int maxTokens = 512;
 
-        public Builder() {}
+        public Builder() {
+        }
+
+        public static Builder copyOf(ILLMConfig config) {
+            return new Builder()
+                    .withModel(config.model())
+                    .withContextLength(config.contextLength())
+                    .withTemperature(config.temperature())
+                    .withTopK(config.topK())
+                    .withTopP(config.topP())
+                    .withMaxTokens(config.maxTokens());
+        }
+
+        public static Builder defaultConfig() {
+            return new Builder()
+                    .withModel("gpt-3.5-turbo")
+                    .withContextLength(2048)
+                    .withTemperature(0.7)
+                    .withTopK(40)
+                    .withTopP(0.9)
+                    .withMaxTokens(512);
+        }
 
         public Builder withModel(String model) {
             this.model = model;
@@ -60,7 +83,7 @@ public record LLMConfig(
             return this;
         }
 
-        public LLMConfig build() {
+        public ILLMConfig build() {
             if (contextLength <= 0) throw new IllegalArgumentException("Context length must be greater than 0");
             if (temperature <= 0) throw new IllegalArgumentException("Temperature must be greater than 0");
             if (topK <= 0) throw new IllegalArgumentException("Top-K must be greater than 0");
@@ -68,26 +91,6 @@ public record LLMConfig(
             if (maxTokens <= 0) throw new IllegalArgumentException("Max tokens must be greater than 0");
 
             return new LLMConfig(model, contextLength, temperature, topK, topP, maxTokens);
-        }
-
-        public static Builder copyOf(LLMConfig config) {
-            return new Builder()
-                .withModel(config.model())
-                .withContextLength(config.contextLength())
-                .withTemperature(config.temperature())
-                .withTopK(config.topK())
-                .withTopP(config.topP())
-                .withMaxTokens(config.maxTokens());
-        }
-
-        public static Builder defaultConfig() {
-            return new Builder()
-                .withModel("gpt-3.5-turbo")
-                .withContextLength(2048)
-                .withTemperature(0.7)
-                .withTopK(40)
-                .withTopP(0.9)
-                .withMaxTokens(512);
         }
     }
 }

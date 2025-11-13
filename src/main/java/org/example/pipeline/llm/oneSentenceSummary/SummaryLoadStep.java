@@ -14,40 +14,41 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class SummaryLoadStep extends AbstractNeo4jLoaderStep
-    implements IPipelineStep<Stream<SummaryTransformStep.ILLMSummaryStepOutput>, TransformResult> {
-  private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(SummaryLoadStep.class);
-  public SummaryLoadStep(INeo4jProvider neo4JProvider) {
-    super(neo4JProvider);
-  }
+        implements IPipelineStep<Stream<SummaryTransformStep.ILLMSummaryStepOutput>, TransformResult> {
+    private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(SummaryLoadStep.class);
 
-  private void createSummaryNode(Neo4jSummary summaryNode) {
-    String sumNodeId = summaryNode.id();
-    _neo4JProvider.runCypher("MERGE (s:Summary {id: $sumId}) " +
-        "SET s.text = $text",
-        Values.parameters(
-            "sumId", sumNodeId,
-            "text", summaryNode.summaryText()
-        ));
-  }
+    public SummaryLoadStep(INeo4jProvider neo4JProvider) {
+        super(neo4JProvider);
+    }
 
-  @Override
-  public TransformResult process(Stream<SummaryTransformStep.ILLMSummaryStepOutput> input) {
-    Map<Boolean, List<SummaryTransformStep.ILLMSummaryStepOutput>> partitions = input.collect(
-        Collectors.partitioningBy(i -> i instanceof SummaryTransformStep.SummaryLink));
-    LOGGER.info("SummaryLoader: Loading {} summaries...",
-        partitions.get(false).size());
+    private void createSummaryNode(Neo4jSummary summaryNode) {
+        String sumNodeId = summaryNode.id();
+        _neo4JProvider.runCypher("MERGE (s:Summary {id: $sumId}) " +
+                        "SET s.text = $text",
+                Values.parameters(
+                        "sumId", sumNodeId,
+                        "text", summaryNode.summaryText()
+                ));
+    }
 
-    _neo4JProvider.beginTransaction();
-    partitions.get(false).forEach(sumNode -> {
-      createSummaryNode(((SummaryTransformStep.SummaryNode) sumNode).object());
-    });
+    @Override
+    public TransformResult process(Stream<SummaryTransformStep.ILLMSummaryStepOutput> input) {
+        Map<Boolean, List<SummaryTransformStep.ILLMSummaryStepOutput>> partitions = input.collect(
+                Collectors.partitioningBy(i -> i instanceof SummaryTransformStep.SummaryLink));
+        LOGGER.info("SummaryLoader: Loading {} summaries...",
+                partitions.get(false).size());
 
-    LOGGER.info("SummaryLoader: Loading {} summary links...",
-        partitions.get(true).size());
-    partitions.get(true).forEach(sumLink -> {
-      _neo4JProvider.creatLinkNode(((SummaryTransformStep.SummaryLink) sumLink).object());
-    });
-    _neo4JProvider.commitTransactionIfPresent();
-    return null;
-  }
+        _neo4JProvider.beginTransaction();
+        partitions.get(false).forEach(sumNode -> {
+            createSummaryNode(((SummaryTransformStep.SummaryNode) sumNode).object());
+        });
+
+        LOGGER.info("SummaryLoader: Loading {} summary links...",
+                partitions.get(true).size());
+        partitions.get(true).forEach(sumLink -> {
+            _neo4JProvider.creatLinkNode(((SummaryTransformStep.SummaryLink) sumLink).object());
+        });
+        _neo4JProvider.commitTransactionIfPresent();
+        return null;
+    }
 }

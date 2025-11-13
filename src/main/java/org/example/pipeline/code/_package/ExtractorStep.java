@@ -1,8 +1,8 @@
 package org.example.pipeline.code._package;
 
 import org.example.datamodel.api.code.IQualifiedName;
-import org.example.datamodel.impl.code.CodeModel;
 import org.example.datamodel.api.code.wrapper.IPackage;
+import org.example.datamodel.impl.code.CodeModel;
 import org.example.pipeline.IPipelineStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

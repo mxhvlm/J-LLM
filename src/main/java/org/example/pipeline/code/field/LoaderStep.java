@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 public class LoaderStep extends AbstractNeo4jLoaderStep
         implements IPipelineStep<Stream<TransformerStep.IFieldTransformerOutput>, TransformResult> {
     private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(LoaderStep.class);
+
     public LoaderStep(INeo4jProvider neo4JProvider) {
         super(neo4JProvider);
     }

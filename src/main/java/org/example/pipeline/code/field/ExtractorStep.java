@@ -15,8 +15,8 @@ public class ExtractorStep implements IPipelineStep<Stream<IType>, Stream<IField
     public Stream<IField> extractFields(Stream<IType> types) {
         LOGGER.info("ModelExtractor: Extracting fields...");
         return types
-            .map(IType::getFields)
-            .flatMap(List::stream);
+                .map(IType::getFields)
+                .flatMap(List::stream);
     }
 
     @Override

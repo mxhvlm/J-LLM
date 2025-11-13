@@ -7,10 +7,10 @@ import org.slf4j.Logger;
 
 public abstract class AbstractBatchedPipelineStep extends AbstractNeo4jMetaStep {
     private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(
-        AbstractBatchedPipelineStep.class);
+            AbstractBatchedPipelineStep.class);
     protected final int _batchSize;
 
-    public AbstractBatchedPipelineStep( int batchSize) {
+    public AbstractBatchedPipelineStep(int batchSize) {
         _batchSize = batchSize;
     }
 
@@ -31,7 +31,7 @@ public abstract class AbstractBatchedPipelineStep extends AbstractNeo4jMetaStep 
             processed += _batchSize;
 
             LOGGER.info("Processed {} of {} methods ({}%)", processed, total,
-                (double) processed / total * 100);
+                    (double) processed / total * 100);
         }
         return neo4JProvider;
     }

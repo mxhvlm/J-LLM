@@ -16,6 +16,7 @@ public class LoaderStep extends AbstractNeo4jLoaderStep
         implements IPipelineStep<Stream<TransformerStep.ITypeOutput>, TransformResult> {
 
     private static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger(LoaderStep.class);
+
     public LoaderStep(INeo4jProvider neo4JProvider) {
         super(neo4JProvider);
     }

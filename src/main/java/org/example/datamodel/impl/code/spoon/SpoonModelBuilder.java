@@ -1,9 +1,9 @@
 package org.example.datamodel.impl.code.spoon;
 
 import org.apache.commons.lang3.NotImplementedException;
+import org.example.datamodel.api.code.IModelBuilder;
 import org.example.datamodel.api.code.wrapper.*;
 import org.example.datamodel.impl.code.CodeModel;
-import org.example.datamodel.api.code.IModelBuilder;
 import org.example.datamodel.impl.code.wrapper.CodeObjectRegistry;
 import org.slf4j.Logger;
 import spoon.Launcher;
@@ -18,7 +18,7 @@ public class SpoonModelBuilder implements IModelBuilder {
     private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(SpoonModelBuilder.class);
 
     private final CodeObjectRegistry _objectRegistry;
-
+    private final List<String> _inputResourcePaths;
     private boolean _enableAutoImports = true;
     private String _modelName = "Model";
 
@@ -32,8 +32,6 @@ public class SpoonModelBuilder implements IModelBuilder {
         _objectRegistry.createRegister(IMethod.class, CtMethod.class);
         _objectRegistry.createRegister(IParameter.class, CtParameter.class);
     }
-
-    private final List<String> _inputResourcePaths;
 
     public IModelBuilder addInputResource(String inputResourcePath) {
         _inputResourcePaths.add(inputResourcePath);
@@ -57,11 +55,11 @@ public class SpoonModelBuilder implements IModelBuilder {
 
     private List<IPackage> getPackages(SpoonAPI spoon) {
         return spoon.getModel()
-            .getAllPackages()
-            .stream()
-            .filter(ctPackage -> !ctPackage.isUnnamedPackage())
-            .map(p -> _objectRegistry.getRegister(IPackage.class).getOrCreate(QualifiedNameFactory.fromCtElement(p), () -> new WrappedCtPackage(p)))
-            .toList();
+                .getAllPackages()
+                .stream()
+                .filter(ctPackage -> !ctPackage.isUnnamedPackage())
+                .map(p -> _objectRegistry.getRegister(IPackage.class).getOrCreate(QualifiedNameFactory.fromCtElement(p), () -> new WrappedCtPackage(p)))
+                .toList();
     }
 
     private List<IType> getInstantiatedTypes(SpoonAPI spoon) {
@@ -107,7 +105,7 @@ public class SpoonModelBuilder implements IModelBuilder {
         LOGGER.info("Iterative dependency resolution starting...");
         int iteration = 0;
         // TODO: If we keep iterating, we're adding more and more types, etc. from the java standard library.
-        while(_objectRegistry.getAllObjects().anyMatch(e -> !e.isResolved())) {
+        while (_objectRegistry.getAllObjects().anyMatch(e -> !e.isResolved())) {
             LOGGER.info("Resolution iteration: {}", iteration);
 
             LOGGER.info("Resolving packages...");

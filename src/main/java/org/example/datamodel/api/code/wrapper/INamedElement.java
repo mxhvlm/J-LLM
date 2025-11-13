@@ -18,6 +18,7 @@ public interface INamedElement extends IResolvable {
 
     /**
      * Get the parent element in the code model hierarchy.
+     *
      * @return The parent element, or an empty Optional if there is no parent.
      * This can be the case for the top-level element or anonymous elements.
      */

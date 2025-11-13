@@ -1,8 +1,8 @@
 package org.example.pipeline.llm;
 
-import org.example.integration.api.llm.ILLMProvider;
 import org.example.integration.api.IApiResponse;
-import org.example.integration.api.llm.LLMConfig;
+import org.example.integration.api.llm.ILLMConfig;
+import org.example.integration.api.llm.ILLMProvider;
 import org.example.pipeline.IPipelineStep;
 import org.slf4j.Logger;
 
@@ -11,17 +11,18 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 public abstract class AbstractLLMTransformStep<T, U> implements IPipelineStep<Stream<T>, Stream<U>> {
-    private final ILLMProvider _llmProvider;
-    protected final LLMConfig _config;
     private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(AbstractLLMTransformStep.class);
+    protected final ILLMConfig _config;
+    private final ILLMProvider _llmProvider;
 
-    public AbstractLLMTransformStep(ILLMProvider llmProvider, LLMConfig config) {
+    public AbstractLLMTransformStep(ILLMProvider llmProvider, ILLMConfig config) {
         _llmProvider = llmProvider;
         _config = config;
     }
 
     /**
      * Hook for subclasses to define the LLM query.
+     *
      * @param input The generic input object
      * @return The LLM query string
      */
@@ -31,17 +32,19 @@ public abstract class AbstractLLMTransformStep<T, U> implements IPipelineStep<St
      * Hook for subclasses to define the LLM configuration.
      * Gets called for each input object to make the configuration dynamic,
      * for example to set the max response token count based on the input size.
+     *
      * @param input The generic input object
      * @return The LLM configuration
      */
-    public abstract LLMConfig getLLMConfig(T input);
+    public abstract ILLMConfig getLLMConfig(T input);
 
     /**
      * Hook for subclasses to process the LLM response and build the output object.
      * Multiple output objects can be created from a single LLM response.
      * Example: Build a new node and a link based on a LLM response
+     *
      * @param input The generic input object
-     * @param resp The LLM response string
+     * @param resp  The LLM response string
      * @return The collection of output objects
      */
     public abstract Collection<U> processLLMResult(T input, String resp);
@@ -61,10 +64,10 @@ public abstract class AbstractLLMTransformStep<T, U> implements IPipelineStep<St
 
     @Override
     public Stream<U> process(Stream<T> input) {
-      return input
-          .map(this::processSingle)
-          .filter(Objects::nonNull)
-          .flatMap(Collection::stream)
-          .filter(Objects::nonNull);
+        return input
+                .map(this::processSingle)
+                .filter(Objects::nonNull)
+                .flatMap(Collection::stream)
+                .filter(Objects::nonNull);
     }
 }

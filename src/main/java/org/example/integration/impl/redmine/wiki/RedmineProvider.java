@@ -1,14 +1,14 @@
 package org.example.integration.impl.redmine.wiki;
 
-import org.example.integration.api.ITokenAuthConfig;
-import org.example.integration.impl.ApiResponse;
+import org.example.datamodel.api.wiki.IWikiPage;
+import org.example.datamodel.impl.wiki.WikiPage;
 import org.example.integration.api.EnumHttpMethod;
 import org.example.integration.api.IApiResponse;
-import org.example.datamodel.api.wiki.IWikiPage;
+import org.example.integration.api.ITokenAuthConfig;
 import org.example.integration.api.wiki.IWikiProvider;
+import org.example.integration.impl.ApiResponse;
 import org.example.integration.impl.redmine.RedmineApiRequest;
 import org.example.integration.impl.redmine.RedminePaginationDTO;
-import org.example.datamodel.impl.wiki.WikiPage;
 import org.slf4j.Logger;
 
 import java.net.http.HttpClient;
@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class RedmineProvider implements IWikiProvider {
-    private final ITokenAuthConfig _apiConfig;
     private static final Logger _LOGGER = org.slf4j.LoggerFactory.getLogger(RedmineProvider.class);
+    private final ITokenAuthConfig _apiConfig;
     private final HttpClient _httpClient;
 
     public RedmineProvider(ITokenAuthConfig apiConfig) {
@@ -37,12 +37,12 @@ public class RedmineProvider implements IWikiProvider {
                 .build()
                 .getResponse(_httpClient, RedminePageListDTO.class)
                 .map(dto ->
-                    ApiResponse.success(
-                        dto.wiki_pages()
-                            .stream()
-                            .map(RedminePageListDTO.RedminePageListObjectDTO::title)
-                            .toList()
-                    ), ApiResponse::failure);
+                        ApiResponse.success(
+                                dto.wiki_pages()
+                                        .stream()
+                                        .map(RedminePageListDTO.RedminePageListObjectDTO::title)
+                                        .toList()
+                        ), ApiResponse::failure);
     }
 
     @Override
@@ -74,12 +74,12 @@ public class RedmineProvider implements IWikiProvider {
                     // from the Redmine-specific implementation
                     return ApiResponse.success(
                             new WikiPage(
-                                dto.title(),
-                                dto.text(),
-                                dto.author(),
-                                dto.version(),
-                                dto.createdOn(),
-                                dto.updatedOn())
+                                    dto.title(),
+                                    dto.text(),
+                                    dto.author(),
+                                    dto.version(),
+                                    dto.createdOn(),
+                                    dto.updatedOn())
                     );
                 }, ApiResponse::failure);
     }
@@ -128,7 +128,7 @@ public class RedmineProvider implements IWikiProvider {
                 .build()
                 .getResponse(_httpClient, RedminePageListDTO.class)
                 .map(dto ->
-                    ApiResponse.success(dto.wiki_pages().stream().map(RedminePageListDTO.RedminePageListObjectDTO::title).toList()),
+                                ApiResponse.success(dto.wiki_pages().stream().map(RedminePageListDTO.RedminePageListObjectDTO::title).toList()),
                         ApiResponse::failure);
     }
 
@@ -136,7 +136,7 @@ public class RedmineProvider implements IWikiProvider {
     public IApiResponse<List<IWikiPage>> getPageContentPaginated(String projectName, int offset, int limit) {
         return getPageTitlesPaginated(projectName, offset, limit)
                 .map(pageTitles -> {
-                    List<IApiResponse<IWikiPage >> pageResponses = pageTitles.stream()
+                    List<IApiResponse<IWikiPage>> pageResponses = pageTitles.stream()
                             .map(title -> getPageContent(projectName, title))
                             .toList();
 

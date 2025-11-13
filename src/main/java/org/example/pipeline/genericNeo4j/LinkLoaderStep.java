@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public class LinkLoaderStep extends AbstractNeo4jLoaderStep
-    implements IPipelineStep<Stream<Neo4JLink>, TransformResult> {
+        implements IPipelineStep<Stream<Neo4JLink>, TransformResult> {
     private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(LinkLoaderStep.class);
 
     public LinkLoaderStep(INeo4jProvider neo4JProvider) {

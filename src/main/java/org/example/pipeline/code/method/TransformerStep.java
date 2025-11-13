@@ -20,31 +20,23 @@ import java.util.stream.Stream;
 public class TransformerStep implements IPipelineStep<Stream<IMethod>, Stream<TransformerStep.IMethodTransformerOutput>> {
     private static final Logger LOGGER = LoggerFactory.getLogger(TransformerStep.class);
 
-    public sealed interface IMethodTransformerOutput
-        permits MethodLinkNode, MethodNode, MethodTypeArgumentNode, MethodParamObject {}
-
-    record MethodNode(Neo4jMethod object) implements IMethodTransformerOutput {}
-    record MethodParamObject(Neo4jParam object) implements IMethodTransformerOutput {}
-    record MethodLinkNode(Neo4JLink link) implements IMethodTransformerOutput {}
-    record MethodTypeArgumentNode(Neo4jTypeArgument object) implements IMethodTransformerOutput {}
-
     private Stream<IMethodTransformerOutput> createMethodObjects(Stream<IMethod> methods) {
         return methods
-            .map(m -> {
-                String declaringTypeName = m.getDeclaringType()
-                        .map(IType::getName)
-                        .map(IQualifiedName::getQualifiedName)
-                        .orElse("ERROR");
-                String methodSignature = m.getSignature();
-                String modifiers = String.join(",", m.getModifiers());
-                String sourceCode = m.getBody();
+                .map(m -> {
+                    String declaringTypeName = m.getDeclaringType()
+                            .map(IType::getName)
+                            .map(IQualifiedName::getQualifiedName)
+                            .orElse("ERROR");
+                    String methodSignature = m.getSignature();
+                    String modifiers = String.join(",", m.getModifiers());
+                    String sourceCode = m.getBody();
 
-                String javadoc = m.getDocumentation();
-                String methodName = m.getName().getSimpleName();
+                    String javadoc = m.getDocumentation();
+                    String methodName = m.getName().getSimpleName();
 
-                LOGGER.trace("Creating method node: " + declaringTypeName + "#" + methodSignature);
-                return new Neo4jMethod(methodName, declaringTypeName, methodSignature, modifiers, sourceCode, javadoc);
-            }).map(MethodNode::new);
+                    LOGGER.trace("Creating method node: " + declaringTypeName + "#" + methodSignature);
+                    return new Neo4jMethod(methodName, declaringTypeName, methodSignature, modifiers, sourceCode, javadoc);
+                }).map(MethodNode::new);
     }
 
     private List<IMethodTransformerOutput> createLinks(Stream<IMethod> methods) {
@@ -79,23 +71,23 @@ public class TransformerStep implements IPipelineStep<Stream<IMethod>, Stream<Tr
     }
 
     private IMethodTransformerOutput createParentLink(IMethod method) {
-            String declaringTypeName = method.getDeclaringType()
-                    .map(IType::getName)
-                    .map(IQualifiedName::getQualifiedName)
-                    .orElse("ERROR");
+        String declaringTypeName = method.getDeclaringType()
+                .map(IType::getName)
+                .map(IQualifiedName::getQualifiedName)
+                .orElse("ERROR");
 
-            String methodSignature = method.getSignature();
+        String methodSignature = method.getSignature();
 
-            LOGGER.trace("Linking " + declaringTypeName + " to method " + methodSignature);
-            return new MethodLinkNode(Neo4JLink.Builder.create()
-                    .withLabel("HAS_METHOD")
-                    .parentLabel("Type")
-                    .parentProp("name")
-                    .parentValue(declaringTypeName)
-                    .childLabel("Method")
-                    .childProp("id")
-                    .childValue(declaringTypeName + "#" + methodSignature)
-                    .build());
+        LOGGER.trace("Linking " + declaringTypeName + " to method " + methodSignature);
+        return new MethodLinkNode(Neo4JLink.Builder.create()
+                .withLabel("HAS_METHOD")
+                .parentLabel("Type")
+                .parentProp("name")
+                .parentValue(declaringTypeName)
+                .childLabel("Method")
+                .childProp("id")
+                .childValue(declaringTypeName + "#" + methodSignature)
+                .build());
     }
 
     private List<IMethodTransformerOutput> createOverrideLinks(IMethod method) {
@@ -177,7 +169,6 @@ public class TransformerStep implements IPipelineStep<Stream<IMethod>, Stream<Tr
         );
     }
 
-
     private List<IMethodTransformerOutput> createParameterLinks(IMethod method, IParameter parameter) {
         String declaringTypeName = method.getDeclaringType()
                 .map(IType::getName)
@@ -224,7 +215,6 @@ public class TransformerStep implements IPipelineStep<Stream<IMethod>, Stream<Tr
         );
     }
 
-
     private List<IMethodTransformerOutput> createFieldDepLinks(IMethod method) {
         String declaringTypeName = method.getDeclaringType()
                 .map(IType::getName)
@@ -235,10 +225,10 @@ public class TransformerStep implements IPipelineStep<Stream<IMethod>, Stream<Tr
 
         Map<String, MethodLinkNode> links = new HashMap<>();
 
-        method.getReferencedFields().stream().filter(Objects::isNull).forEach(field ->{
+        method.getReferencedFields().stream().filter(Objects::isNull).forEach(field -> {
             LOGGER.warn("Method {}#{} has null referenced field!. Non-Null references are: {}", declaringTypeName, methodSignature, method.getReferencedFields().stream().filter(Objects::nonNull).map(INamedElement::getName).toList());
         });
-        method.getReferencedFields().stream().filter(Objects::nonNull).forEach(field ->{
+        method.getReferencedFields().stream().filter(Objects::nonNull).forEach(field -> {
             String fieldNameQualified = field.getName().getQualifiedName();
             LOGGER.trace("Linking method {}#{} to field {}", declaringTypeName, methodSignature, fieldNameQualified);
             links.computeIfAbsent(fieldNameQualified, key ->
@@ -248,7 +238,7 @@ public class TransformerStep implements IPipelineStep<Stream<IMethod>, Stream<Tr
                                     .betweenLabels("Method", "Field")
                                     .betweenProps("id")
                                     .parentValue(method.getName().getQualifiedName())
-                                    .childValue(fieldNameQualified  )
+                                    .childValue(fieldNameQualified)
                                     .build()
                     )
             );
@@ -260,12 +250,28 @@ public class TransformerStep implements IPipelineStep<Stream<IMethod>, Stream<Tr
     @Override
     public Stream<IMethodTransformerOutput> process(Stream<IMethod> input) {
         LOGGER.info("MethodExporter: Processing methods...");
-      List<IMethod> methods = input.toList();  // or input.collect(Collectors.toList());
-      createMethodObjects(methods.stream());
-      createLinks(methods.stream());
-      return Stream.concat(
-            createMethodObjects(methods.stream()),
-            createLinks(methods.stream()).stream()
+        List<IMethod> methods = input.toList();  // or input.collect(Collectors.toList());
+        createMethodObjects(methods.stream());
+        createLinks(methods.stream());
+        return Stream.concat(
+                createMethodObjects(methods.stream()),
+                createLinks(methods.stream()).stream()
         );
+    }
+
+    public sealed interface IMethodTransformerOutput
+            permits MethodLinkNode, MethodNode, MethodTypeArgumentNode, MethodParamObject {
+    }
+
+    record MethodNode(Neo4jMethod object) implements IMethodTransformerOutput {
+    }
+
+    record MethodParamObject(Neo4jParam object) implements IMethodTransformerOutput {
+    }
+
+    record MethodLinkNode(Neo4JLink link) implements IMethodTransformerOutput {
+    }
+
+    record MethodTypeArgumentNode(Neo4jTypeArgument object) implements IMethodTransformerOutput {
     }
 }

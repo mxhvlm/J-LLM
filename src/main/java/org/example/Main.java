@@ -2,6 +2,7 @@ package org.example;
 
 public class Main {
     private static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger(Main.class);
+
     public static void main(String[] args) {
         JLLM jllm = new JLLM();
         jllm.run();

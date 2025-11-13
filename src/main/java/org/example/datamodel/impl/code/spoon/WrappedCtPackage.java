@@ -1,9 +1,9 @@
 package org.example.datamodel.impl.code.spoon;
 
-import org.example.datamodel.impl.code.wrapper.AbstractWrappedPackage;
-import org.example.datamodel.impl.code.wrapper.CodeObjectRegistry;
 import org.example.datamodel.api.code.wrapper.IPackage;
 import org.example.datamodel.api.code.wrapper.IType;
+import org.example.datamodel.impl.code.wrapper.AbstractWrappedPackage;
+import org.example.datamodel.impl.code.wrapper.CodeObjectRegistry;
 import spoon.reflect.declaration.CtPackage;
 
 import java.util.List;

@@ -41,13 +41,13 @@ public class CodeModel implements ICodeModel {
     }
 
     public String[] getStatistics() {
-        return new String[] {
-            "Model Name: " + _name,
-            "Total Packages: " + _allPackages.size(),
-            "Total Types: " + _allTypes.size(),
-            "Total Fields: " + _allFields.size(),
-            "Total Methods: " + _allMethods.size(),
-            "Total Parameters: " + _allParameters.size()
+        return new String[]{
+                "Model Name: " + _name,
+                "Total Packages: " + _allPackages.size(),
+                "Total Types: " + _allTypes.size(),
+                "Total Fields: " + _allFields.size(),
+                "Total Methods: " + _allMethods.size(),
+                "Total Parameters: " + _allParameters.size()
         };
     }
 

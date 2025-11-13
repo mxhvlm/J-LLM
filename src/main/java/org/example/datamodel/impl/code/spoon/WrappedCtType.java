@@ -3,7 +3,9 @@ package org.example.datamodel.impl.code.spoon;
 import org.example.datamodel.api.code.wrapper.*;
 import org.example.datamodel.impl.code.wrapper.AbstractWrappedType;
 import org.example.datamodel.impl.code.wrapper.CodeObjectRegistry;
-import spoon.reflect.declaration.*;
+import spoon.reflect.declaration.CtElement;
+import spoon.reflect.declaration.CtPackage;
+import spoon.reflect.declaration.CtType;
 
 import java.util.Collection;
 import java.util.List;
@@ -50,8 +52,8 @@ public class WrappedCtType extends AbstractWrappedType<CtType<?>> {
         if (getWrappedObject().getSuperclass() != null && getWrappedObject().getSuperclass().getTypeDeclaration() != null) {
             return Optional.of(
                     registry.getRegister(IType.class).getOrCreate(
-                        QualifiedNameFactory.fromCtElement(getWrappedObject().getSuperclass().getTypeDeclaration()),
-                        () -> new WrappedCtType(getWrappedObject().getSuperclass().getTypeDeclaration()))
+                            QualifiedNameFactory.fromCtElement(getWrappedObject().getSuperclass().getTypeDeclaration()),
+                            () -> new WrappedCtType(getWrappedObject().getSuperclass().getTypeDeclaration()))
             );
         } else {
 //            _LOGGER.warn("Could not resolve super type for: " + getName() + ", " + getWrappedObject().getSuperclass());

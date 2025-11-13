@@ -11,9 +11,14 @@ import java.util.Collection;
  */
 public interface ICodeModel {
     Collection<IPackage> getPackages();
+
     Collection<IField> getFields();
+
     Collection<IType> getTypes();
+
     Collection<IMethod> getMethods();
+
     Collection<IParameter> getParameters();
+
     Collection<IType> getInstantiatedTypes();
 }

@@ -53,8 +53,8 @@ public class WrappedCtMethod<T extends CtMethod<?>> extends AbstractWrappedMetho
         if (getWrappedObject().getType() != null && getWrappedObject().getType().getTypeDeclaration() != null) {
             return Optional.of(
                     registry.getRegister(IType.class).getOrCreate(
-                        QualifiedNameFactory.fromCtElement(getWrappedObject().getType().getTypeDeclaration()),
-                        () -> new WrappedCtType(getWrappedObject().getType().getTypeDeclaration()))
+                            QualifiedNameFactory.fromCtElement(getWrappedObject().getType().getTypeDeclaration()),
+                            () -> new WrappedCtType(getWrappedObject().getType().getTypeDeclaration()))
             );
         }
         return Optional.empty();

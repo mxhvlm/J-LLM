@@ -13,7 +13,7 @@ public class JiraAPISearchIssueRequest implements IApiRequest {
     private final String _endpoint = "/rest/api/2/search";
 
     private JiraAPISearchIssueRequest(JiraApiConfig apiConfig, String jqlQuery) {
-        _apiConfig  = apiConfig;
+        _apiConfig = apiConfig;
         _jqlQuery = jqlQuery;
     }
 

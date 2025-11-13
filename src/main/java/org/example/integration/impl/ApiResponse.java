@@ -47,7 +47,7 @@ public class ApiResponse<T> implements IApiResponse<T> {
     @Override
     public <U> U map(Function<T, U> successHandler, Function<String, U> errorHandler) {
         return isSuccess()
-            ? successHandler.apply(_response)
-            : errorHandler.apply(_errorMessage);
+                ? successHandler.apply(_response)
+                : errorHandler.apply(_errorMessage);
     }
 }

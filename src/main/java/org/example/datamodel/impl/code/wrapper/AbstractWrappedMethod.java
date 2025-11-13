@@ -35,7 +35,7 @@ public abstract class AbstractWrappedMethod<T> extends AbstractWrappedElement<T>
     @Override
     public void resolve(CodeObjectRegistry registry) {
         super.resolve(registry);
-        
+
         _modifiers.addAll(resolveModifiers(registry));
         _parameters.addAll(resolveParameters(registry));
         _exceptions.addAll(resolveExceptions(registry));
@@ -101,12 +101,20 @@ public abstract class AbstractWrappedMethod<T> extends AbstractWrappedElement<T>
 
     // Hook methods providing the lib-specific resolution logic
     protected abstract List<String> resolveModifiers(CodeObjectRegistry registry);
+
     protected abstract List<IParameter> resolveParameters(CodeObjectRegistry registry);
+
     protected abstract List<IType> resolveExceptions(CodeObjectRegistry registry);
+
     protected abstract Optional<IType> resolveReturnType(CodeObjectRegistry registry);
+
     protected abstract String resolveSignature(CodeObjectRegistry registry);
+
     protected abstract String resolveMethodBody(CodeObjectRegistry registry);
+
     protected abstract String resolveDocumentation(CodeObjectRegistry registry);
+
     protected abstract List<IMethod> resolveReferencedMethods(CodeObjectRegistry registry);
+
     protected abstract List<IField> resolveReferencedFields(CodeObjectRegistry registry);
 }

@@ -1,13 +1,13 @@
 package org.example.integration.impl.redmine.projectmanagement;
 
+import org.example.datamodel.api.projectmanagement.ITicket;
+import org.example.datamodel.impl.projectmanagement.Ticket;
 import org.example.integration.api.EnumHttpMethod;
 import org.example.integration.api.IApiResponse;
 import org.example.integration.api.ITokenAuthConfig;
 import org.example.integration.api.projectmanagement.IProjectManagementProvider;
-import org.example.datamodel.api.projectmanagement.ITicket;
 import org.example.integration.impl.ApiResponse;
 import org.example.integration.impl.redmine.RedmineApiRequest;
-import org.example.datamodel.impl.projectmanagement.Ticket;
 import org.slf4j.Logger;
 
 import java.net.URLDecoder;
@@ -20,85 +20,13 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class RedmineProvider implements IProjectManagementProvider {
-    private final ITokenAuthConfig _apiConfig;
     private static final Logger _LOGGER = org.slf4j.LoggerFactory.getLogger(RedmineProvider.class);
+    private final ITokenAuthConfig _apiConfig;
     private final HttpClient _httpClient;
 
     public RedmineProvider(ITokenAuthConfig apiConfig) {
         _apiConfig = apiConfig;
         _httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(30)).build();
-    }
-
-    @Override
-    public IApiResponse<List<ITicket>> getAllTickets() {
-        _LOGGER.info("Fetching all tickets from Redmine...");
-        return RedmineApiRequest.Builder.create()
-                .withConfig(_apiConfig)
-                .withMethod(EnumHttpMethod.GET)
-                .withEndpoint("/issues")
-                .withPagination()
-                .build()
-                .getResponse(_httpClient, RedmineIssueListDTO.class)
-                .map(dto-> ApiResponse.success(dto.issues().stream()
-                        .map(issue -> new Ticket(issue.getAllFields()))
-                        .collect(Collectors.toUnmodifiableList())),
-                    ApiResponse::failure);
-    }
-
-    @Override
-    public IApiResponse<List<ITicket>> getTicketsForProject(String projectIdentifier) {
-        _LOGGER.info("Fetching tickets for project: {}", projectIdentifier);
-        return RedmineApiRequest.Builder.create()
-                .withConfig(_apiConfig)
-                .withMethod(EnumHttpMethod.GET)
-                .withEndpoint("/issues")
-                .withQueryParam("project_id", projectIdentifier)
-                .withPagination()
-                .build()
-                .getResponse(_httpClient, RedmineIssueListDTO.class)
-                .map(dto-> ApiResponse.success(dto.issues().stream()
-                        .map(issue -> new Ticket(issue.getAllFields()))
-                        .collect(Collectors.toUnmodifiableList())),
-                    ApiResponse::failure);
-    }
-
-    /**
-     * Fetch tickets based on a query string.</br>
-     * @param query The query string to filter tickets within the project management system.</br>
-     *              Within Redmine, there is no jql-like query language, instead filtering is done through query params.</br>
-     *              Example: GET /issues.xml</br>
-     *                  GET /issues.xml?issue_id=1</br>
-     *                  GET /issues.xml?issue_id=1,2</br>
-     *                  GET /issues.xml?project_id=2</br>
-     *                  GET /issues.xml?project_id=2&tracker_id=1</br>
-     *                  GET /issues.xml?assigned_to_id=6</br>
-     *                  GET /issues.xml?assigned_to_id=me</br>
-     *                  GET /issues.xml?status_id=closed</br>
-     *                  GET /issues.xml?status_id=*</br>
-     *                  GET /issues.xml?cf_1=abcdef</br>
-     *                  GET /issues.xml?sort=category:desc,updated_on</br>
-     *              Therefore, this method expects a String of query parameters to be appended to the /issues endpoint.
-     * @return A response containing a list of tickets matching the query.
-     */
-    @Override
-    public IApiResponse<List<ITicket>> getTicketsByQuery(String query) {
-        _LOGGER.info("Fetching tickets by query: {}", query);
-
-        // Convert the query string into individual query parameters
-        Map<String, String> queryParams = parseQuery(query);
-
-        return RedmineApiRequest.Builder.create()
-                .withConfig(_apiConfig)
-                .withMethod(EnumHttpMethod.GET)
-                .withEndpoint("/issues")
-                .withQueryParams(queryParams)
-                .withPagination()
-                .build()
-                .getResponse(_httpClient, RedmineIssueListDTO.class)
-                .map(dto-> ApiResponse.success(dto.issues().stream()
-                        .map(issue -> new Ticket(issue.getAllFields()))
-                        .collect(Collectors.toUnmodifiableList())),
-                    ApiResponse::failure);
     }
 
     private static Map<String, String> parseQuery(String query) {
@@ -117,5 +45,78 @@ public class RedmineProvider implements IProjectManagementProvider {
         }
 
         return map;
+    }
+
+    @Override
+    public IApiResponse<List<ITicket>> getAllTickets() {
+        _LOGGER.info("Fetching all tickets from Redmine...");
+        return RedmineApiRequest.Builder.create()
+                .withConfig(_apiConfig)
+                .withMethod(EnumHttpMethod.GET)
+                .withEndpoint("/issues")
+                .withPagination()
+                .build()
+                .getResponse(_httpClient, RedmineIssueListDTO.class)
+                .map(dto -> ApiResponse.success(dto.issues().stream()
+                                .map(issue -> new Ticket(issue.getAllFields()))
+                                .collect(Collectors.toUnmodifiableList())),
+                        ApiResponse::failure);
+    }
+
+    @Override
+    public IApiResponse<List<ITicket>> getTicketsForProject(String projectIdentifier) {
+        _LOGGER.info("Fetching tickets for project: {}", projectIdentifier);
+        return RedmineApiRequest.Builder.create()
+                .withConfig(_apiConfig)
+                .withMethod(EnumHttpMethod.GET)
+                .withEndpoint("/issues")
+                .withQueryParam("project_id", projectIdentifier)
+                .withPagination()
+                .build()
+                .getResponse(_httpClient, RedmineIssueListDTO.class)
+                .map(dto -> ApiResponse.success(dto.issues().stream()
+                                .map(issue -> new Ticket(issue.getAllFields()))
+                                .collect(Collectors.toUnmodifiableList())),
+                        ApiResponse::failure);
+    }
+
+    /**
+     * Fetch tickets based on a query string.</br>
+     *
+     * @param query The query string to filter tickets within the project management system.</br>
+     *              Within Redmine, there is no jql-like query language, instead filtering is done through query params.</br>
+     *              Example: GET /issues.xml</br>
+     *              GET /issues.xml?issue_id=1</br>
+     *              GET /issues.xml?issue_id=1,2</br>
+     *              GET /issues.xml?project_id=2</br>
+     *              GET /issues.xml?project_id=2&tracker_id=1</br>
+     *              GET /issues.xml?assigned_to_id=6</br>
+     *              GET /issues.xml?assigned_to_id=me</br>
+     *              GET /issues.xml?status_id=closed</br>
+     *              GET /issues.xml?status_id=*</br>
+     *              GET /issues.xml?cf_1=abcdef</br>
+     *              GET /issues.xml?sort=category:desc,updated_on</br>
+     *              Therefore, this method expects a String of query parameters to be appended to the /issues endpoint.
+     * @return A response containing a list of tickets matching the query.
+     */
+    @Override
+    public IApiResponse<List<ITicket>> getTicketsByQuery(String query) {
+        _LOGGER.info("Fetching tickets by query: {}", query);
+
+        // Convert the query string into individual query parameters
+        Map<String, String> queryParams = parseQuery(query);
+
+        return RedmineApiRequest.Builder.create()
+                .withConfig(_apiConfig)
+                .withMethod(EnumHttpMethod.GET)
+                .withEndpoint("/issues")
+                .withQueryParams(queryParams)
+                .withPagination()
+                .build()
+                .getResponse(_httpClient, RedmineIssueListDTO.class)
+                .map(dto -> ApiResponse.success(dto.issues().stream()
+                                .map(issue -> new Ticket(issue.getAllFields()))
+                                .collect(Collectors.toUnmodifiableList())),
+                        ApiResponse::failure);
     }
 }

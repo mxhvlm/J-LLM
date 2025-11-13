@@ -11,6 +11,7 @@ public interface IQualifiedName {
 
     interface IQualifiedNamePart {
         String name();
+
         EnumQualifiedNameSeparator separator();
     }
 }

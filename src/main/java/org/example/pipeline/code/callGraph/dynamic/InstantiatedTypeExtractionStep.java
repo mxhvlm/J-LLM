@@ -11,32 +11,32 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 public class InstantiatedTypeExtractionStep
-    implements IPipelineStep<
+        implements IPipelineStep<
         Pair<CodeModel, Stream<? extends CtExecutableReference<?>>>,
         Pair<Stream<CtTypeReference<?>>, Stream<? extends CtExecutableReference<?>>>> {
 
-  private final Config _config;
+    private final Config _config;
 
-  public InstantiatedTypeExtractionStep(Config config) {
-    _config = config;
-  }
+    public InstantiatedTypeExtractionStep(Config config) {
+        _config = config;
+    }
 
-  public Set<CtTypeReference<?>> getInstantiatedTypeReferences(CodeModel codeModel) {
-    throw new NotImplementedException("Needs to be re-implemented using the wrapper");
+    public Set<CtTypeReference<?>> getInstantiatedTypeReferences(CodeModel codeModel) {
+        throw new NotImplementedException("Needs to be re-implemented using the wrapper");
 //    return codeModel.getCtModel()
 //        .getElements(new TypeFilter<CtConstructorCall<?>>(CtConstructorCall.class)).stream()
 //        .map(CtConstructorCall::getType)
 //        .filter(ref -> isInScope(ref.getQualifiedName()))
 //        .collect(Collectors.toSet());
-  }
+    }
 
-  private boolean isInScope(String qualifiedName) {
-    return _config.scope().stream().anyMatch(qualifiedName::startsWith);
-  }
+    private boolean isInScope(String qualifiedName) {
+        return _config.scope().stream().anyMatch(qualifiedName::startsWith);
+    }
 
-  @Override
-  public Pair<Stream<CtTypeReference<?>>, Stream<? extends CtExecutableReference<?>>> process(
-      Pair<CodeModel, Stream<? extends CtExecutableReference<?>>> input) {
-    return Pair.of(getInstantiatedTypeReferences(input.getLeft()).stream(), input.getRight());
-  }
+    @Override
+    public Pair<Stream<CtTypeReference<?>>, Stream<? extends CtExecutableReference<?>>> process(
+            Pair<CodeModel, Stream<? extends CtExecutableReference<?>>> input) {
+        return Pair.of(getInstantiatedTypeReferences(input.getLeft()).stream(), input.getRight());
+    }
 }

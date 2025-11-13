@@ -12,15 +12,14 @@ import java.util.List;
 import java.util.Optional;
 
 public abstract class AbstractWrappedType<T> extends AbstractWrappedElement<T> implements IType {
+    protected static final Logger _LOGGER = LoggerFactory.getLogger(AbstractWrappedType.class);
     protected final List<IField> _fields;
     protected final List<IMethod> _methods;
     protected final List<IType> _innerTypes;
-    protected @Nullable IType _superType;
     protected final List<IType> _interfaces;
-    protected EnumTypeKind _typeKind;
     protected final List<String> _modifiers;
-
-    protected static final Logger _LOGGER = LoggerFactory.getLogger(AbstractWrappedType.class);
+    protected @Nullable IType _superType;
+    protected EnumTypeKind _typeKind;
 
     public AbstractWrappedType(T wrappedObject, IQualifiedName qualifiedName) {
         super(wrappedObject, qualifiedName);
@@ -34,7 +33,7 @@ public abstract class AbstractWrappedType<T> extends AbstractWrappedElement<T> i
     @Override
     public void resolve(CodeObjectRegistry registry) {
         super.resolve(registry);
-        
+
         _parent = resolveParent(registry).orElse(null);
         _superType = resolveSuperType(registry).orElse(null);
         _innerTypes.addAll(resolveInnerTypes(registry));
@@ -63,15 +62,15 @@ public abstract class AbstractWrappedType<T> extends AbstractWrappedElement<T> i
     @Override
     public Optional<IPackage> getPackage() {
         return getParent()
-            .flatMap(p -> {
-                if (p instanceof IPackage pkg) {
-                    return Optional.of(pkg);
-                } else if (p instanceof IType type) {
-                    return type.getPackage();
-                } else {
-                    throw new IllegalStateException("Parent is neither package nor type: " + p);
-                }
-            });
+                .flatMap(p -> {
+                    if (p instanceof IPackage pkg) {
+                        return Optional.of(pkg);
+                    } else if (p instanceof IType type) {
+                        return type.getPackage();
+                    } else {
+                        throw new IllegalStateException("Parent is neither package nor type: " + p);
+                    }
+                });
     }
 
     @Override
@@ -96,11 +95,18 @@ public abstract class AbstractWrappedType<T> extends AbstractWrappedElement<T> i
 
     // Hook methods providing lib-specific resolution logic
     protected abstract List<IField> resolveFields(CodeObjectRegistry registry);
+
     protected abstract List<IMethod> resolveMethods(CodeObjectRegistry registry);
+
     protected abstract List<IType> resolveInnerTypes(CodeObjectRegistry registry);
+
     protected abstract Optional<IType> resolveSuperType(CodeObjectRegistry registry);
+
     protected abstract List<IType> resolveInterfaces(CodeObjectRegistry registry);
+
     protected abstract Optional<INamedElement> resolveParent(CodeObjectRegistry registry);
+
     protected abstract EnumTypeKind resolveTypeKind(CodeObjectRegistry registry);
+
     protected abstract Collection<String> resolveModifiers(CodeObjectRegistry registry);
 }

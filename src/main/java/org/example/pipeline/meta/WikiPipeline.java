@@ -1,9 +1,8 @@
 package org.example.pipeline.meta;
 
+import org.example.integration.api.llm.ILLMConfig;
 import org.example.integration.api.llm.ILLMProvider;
-import org.example.integration.api.llm.LLMConfig;
 import org.example.integration.api.neo4j.INeo4jProvider;
-import org.example.integration.impl.neo4j.Neo4jProvider;
 import org.example.integration.api.wiki.IWikiProvider;
 import org.example.pipeline.Pipeline;
 import org.example.pipeline.TransformResult;
@@ -15,11 +14,11 @@ import java.util.Arrays;
 
 public class WikiPipeline extends AbstractLLMBatchedPipelineStep {
     private final Logger _LOGGER = org.slf4j.LoggerFactory.getLogger(WikiPipeline.class);
-    private int _currOffset;
     private final String _space;
     private final IWikiProvider _wikiProvider;
+    private int _currOffset;
 
-    public WikiPipeline(int batchSize, LLMConfig config, ILLMProvider llmProvider, String space, IWikiProvider wikiProvider) {
+    public WikiPipeline(int batchSize, ILLMConfig config, ILLMProvider llmProvider, String space, IWikiProvider wikiProvider) {
         super(batchSize, config, llmProvider);
         _currOffset = 0;
         _space = space;
@@ -29,10 +28,10 @@ public class WikiPipeline extends AbstractLLMBatchedPipelineStep {
     @Override
     protected long getNumTotal(INeo4jProvider neo4JProvider) {
         return _wikiProvider.getNumPages(_space)
-            .map(count -> (long) count, err -> {
-                _LOGGER.error("Failed to get number of wiki pages: {}", err);
-                return 0L;
-            });
+                .map(count -> (long) count, err -> {
+                    _LOGGER.error("Failed to get number of wiki pages: {}", err);
+                    return 0L;
+                });
     }
 
     @Override

@@ -9,12 +9,11 @@ import java.util.Objects;
 import java.util.Optional;
 
 public abstract class AbstractWrappedElement<T> implements IWrappedObject<T>, INamedElement {
+    protected static final Logger _LOGGER = org.slf4j.LoggerFactory.getLogger(AbstractWrappedElement.class);
     protected final T _wrappedObject;
     protected final IQualifiedName _qualifiedName;
     protected INamedElement _parent;
     private boolean _isResolved;
-
-    protected static final Logger _LOGGER = org.slf4j.LoggerFactory.getLogger(AbstractWrappedElement.class);
 
     public AbstractWrappedElement(T wrappedObject, IQualifiedName qualifiedName) {
         _wrappedObject = Objects.requireNonNull(wrappedObject);
@@ -57,6 +56,6 @@ public abstract class AbstractWrappedElement<T> implements IWrappedObject<T>, IN
     @Override
     public boolean equals(Object obj) {
         return obj instanceof AbstractWrappedElement<?> other &&
-               this._qualifiedName.equals(other._qualifiedName);
+                this._qualifiedName.equals(other._qualifiedName);
     }
 }

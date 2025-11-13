@@ -1,8 +1,8 @@
 package org.example.integration.impl.atlassian.confluence;
 
 import org.apache.commons.lang3.NotImplementedException;
-import org.example.integration.api.IApiResponse;
 import org.example.datamodel.api.wiki.IWikiPage;
+import org.example.integration.api.IApiResponse;
 import org.example.integration.api.wiki.IWikiProvider;
 
 import java.util.List;

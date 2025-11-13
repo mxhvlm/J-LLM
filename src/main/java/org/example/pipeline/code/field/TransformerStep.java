@@ -16,12 +16,6 @@ import java.util.stream.Stream;
 public class TransformerStep implements IPipelineStep<Stream<IField>, Stream<TransformerStep.IFieldTransformerOutput>> {
     private static final Logger LOGGER = LoggerFactory.getLogger(TransformerStep.class);
 
-    public sealed interface IFieldTransformerOutput permits TransformerStep.FieldNode, TransformerStep.FieldLink {}
-
-    public record FieldNode(Neo4jField object) implements IFieldTransformerOutput {}
-
-    public record FieldLink(Neo4JLink link) implements IFieldTransformerOutput {}
-
     private Stream<Neo4jField> createFieldNodes(Stream<IField> fields) {
         return fields.map(ctField -> {
             INamedElement declType = ctField.getParent().get();
@@ -57,16 +51,16 @@ public class TransformerStep implements IPipelineStep<Stream<IField>, Stream<Tra
 
     private Stream<Neo4JLink> linkFieldTypes(Stream<IField> fields) {
         return fields
-            .filter(f -> f.getType().isPresent())
-            .filter(f -> f.getParent().isPresent())
-            .flatMap(f -> {
-                INamedElement declType = f.getParent().get();
-                String declaringTypeName = declType.getName().getQualifiedName();
-                String fieldName = declType.getName().getSimpleName();
-                IType fieldTypeRef = f.getType().get();
+                .filter(f -> f.getType().isPresent())
+                .filter(f -> f.getParent().isPresent())
+                .flatMap(f -> {
+                    INamedElement declType = f.getParent().get();
+                    String declaringTypeName = declType.getName().getQualifiedName();
+                    String fieldName = declType.getName().getSimpleName();
+                    IType fieldTypeRef = f.getType().get();
 
-                return linkFieldType(declaringTypeName, fieldName, fieldTypeRef);
-            });
+                    return linkFieldType(declaringTypeName, fieldName, fieldTypeRef);
+                });
     }
 
     private Stream<Neo4JLink> linkFieldType(String declaringTypeName, String fieldName, IType fieldTypeRef) {
@@ -102,7 +96,6 @@ public class TransformerStep implements IPipelineStep<Stream<IField>, Stream<Tra
         return links.stream();
     }
 
-
     @Override
     public Stream<IFieldTransformerOutput> process(Stream<IField> input) {
         LOGGER.info("FieldExporter: Processing fields...");
@@ -117,5 +110,14 @@ public class TransformerStep implements IPipelineStep<Stream<IField>, Stream<Tra
         });
 
         return builder.build();
+    }
+
+    public sealed interface IFieldTransformerOutput permits TransformerStep.FieldNode, TransformerStep.FieldLink {
+    }
+
+    public record FieldNode(Neo4jField object) implements IFieldTransformerOutput {
+    }
+
+    public record FieldLink(Neo4JLink link) implements IFieldTransformerOutput {
     }
 }

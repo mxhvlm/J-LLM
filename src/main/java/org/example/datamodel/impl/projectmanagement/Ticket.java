@@ -28,6 +28,7 @@ public class Ticket implements ITicket {
 
     /**
      * Constructor that accepts all fields in a map.
+     *
      * @param allFields A map containing all fields of the ticket, including "name" and "description".
      */
     public Ticket(Map<String, String> allFields) {

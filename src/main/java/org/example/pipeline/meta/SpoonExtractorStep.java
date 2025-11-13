@@ -1,14 +1,14 @@
 package org.example.pipeline.meta;
 
-import org.example.datamodel.impl.code.CodeModel;
 import org.example.JLLMConfig;
+import org.example.datamodel.impl.code.CodeModel;
+import org.example.datamodel.impl.code.spoon.SpoonModelBuilder;
 import org.example.integration.api.neo4j.INeo4jProvider;
 import org.example.pipeline.Pipeline;
 import org.example.pipeline.TransformResult;
 import org.example.pipeline.code._package.ExtractorStep;
 import org.example.pipeline.code._package.LoaderStep;
 import org.example.pipeline.code._package.TransformerStep;
-import org.example.datamodel.impl.code.spoon.SpoonModelBuilder;
 
 public class SpoonExtractorStep extends AbstractNeo4jMetaStep {
 
@@ -19,31 +19,31 @@ public class SpoonExtractorStep extends AbstractNeo4jMetaStep {
         model.printStatistics();
 
         Pipeline<CodeModel, TransformResult> packagePipeline = Pipeline
-            .start(new ExtractorStep())
-            .then(new TransformerStep())
-            .then(new LoaderStep(neo4JProvider))
-            .build();
+                .start(new ExtractorStep())
+                .then(new TransformerStep())
+                .then(new LoaderStep(neo4JProvider))
+                .build();
 
         Pipeline<CodeModel, TransformResult> typePipeline = Pipeline
-            .start(new org.example.pipeline.code.type.ExtractorStep())
-            .then(new org.example.pipeline.code.type.TransformerStep())
-            .then(new org.example.pipeline.code.type.LoaderStep(neo4JProvider))
-            .build();
+                .start(new org.example.pipeline.code.type.ExtractorStep())
+                .then(new org.example.pipeline.code.type.TransformerStep())
+                .then(new org.example.pipeline.code.type.LoaderStep(neo4JProvider))
+                .build();
 
 
         Pipeline<CodeModel, TransformResult> fieldPipeline = Pipeline
-            .start(new org.example.pipeline.code.type.ExtractorStep())
-            .then(new org.example.pipeline.code.field.ExtractorStep())
-            .then(new org.example.pipeline.code.field.TransformerStep())
-            .then(new org.example.pipeline.code.field.LoaderStep(neo4JProvider))
-            .build();
+                .start(new org.example.pipeline.code.type.ExtractorStep())
+                .then(new org.example.pipeline.code.field.ExtractorStep())
+                .then(new org.example.pipeline.code.field.TransformerStep())
+                .then(new org.example.pipeline.code.field.LoaderStep(neo4JProvider))
+                .build();
 
         Pipeline<CodeModel, TransformResult> methodPipeline = Pipeline
-            .start(new org.example.pipeline.code.type.ExtractorStep())
-            .then(new org.example.pipeline.code.method.ExtractorStep())
-            .then(new org.example.pipeline.code.method.TransformerStep())
-            .then(new org.example.pipeline.code.method.LoadStep(neo4JProvider))
-            .build();
+                .start(new org.example.pipeline.code.type.ExtractorStep())
+                .then(new org.example.pipeline.code.method.ExtractorStep())
+                .then(new org.example.pipeline.code.method.TransformerStep())
+                .then(new org.example.pipeline.code.method.LoadStep(neo4JProvider))
+                .build();
 //
 //        Pipeline<CodeModel, TransformResult> methodPipeline = Pipeline
 //            .start(new org.example.pipeline.spoon.type.ExtractorStep())

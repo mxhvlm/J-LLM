@@ -3,7 +3,10 @@ package org.example.datamodel.impl.code.wrapper;
 import org.example.datamodel.api.code.IQualifiedName;
 import org.example.datamodel.api.code.wrapper.INamedElement;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 

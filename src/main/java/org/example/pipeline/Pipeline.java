@@ -19,6 +19,13 @@ public class Pipeline<I, O> {
     }
 
     /**
+     * Creates a builder starting with the first step (from I -> O).
+     */
+    public static <I, O> Builder<I, O> start(IPipelineStep<I, O> firstPipelineStep) {
+        return new Builder<>(firstPipelineStep);
+    }
+
+    /**
      * Runs the pipeline on the given input, sequentially passing
      * each step's output to the next step's input.
      */
@@ -30,13 +37,6 @@ public class Pipeline<I, O> {
             current = typedPipelineStep.process(current);
         }
         return (O) current;
-    }
-
-    /**
-     * Creates a builder starting with the first step (from I -> O).
-     */
-    public static <I, O> Builder<I, O> start(IPipelineStep<I, O> firstPipelineStep) {
-        return new Builder<>(firstPipelineStep);
     }
 
     /**
@@ -59,7 +59,7 @@ public class Pipeline<I, O> {
          * and produces a new type N.
          *
          * @param nextPipelineStep The step from O -> N
-         * @param <N>      The new output type
+         * @param <N>              The new output type
          * @return A new Builder from I -> N
          */
         @SuppressWarnings("unchecked")

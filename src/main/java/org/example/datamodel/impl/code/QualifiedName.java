@@ -28,9 +28,15 @@ public final class QualifiedName implements IQualifiedName {
         _cachedHash = _cachedQualifiedName.hashCode();
     }
 
-    @Override public String toString() { return _cachedQualifiedName; }
+    @Override
+    public String toString() {
+        return _cachedQualifiedName;
+    }
 
-    @Override public int hashCode() { return _cachedHash; }
+    @Override
+    public int hashCode() {
+        return _cachedHash;
+    }
 
     @Override
     public boolean equals(Object obj) {
@@ -41,11 +47,19 @@ public final class QualifiedName implements IQualifiedName {
     }
 
     @Override
-    public List<IQualifiedNamePart> getParts() { return _parts; }
+    public List<IQualifiedNamePart> getParts() {
+        return _parts;
+    }
+
     @Override
-    public String getQualifiedName() { return _cachedQualifiedName; }
+    public String getQualifiedName() {
+        return _cachedQualifiedName;
+    }
+
     @Override
-    public String getSimpleName() { return _cachedSimpleName; }
+    public String getSimpleName() {
+        return _cachedSimpleName;
+    }
 
     public record Part(String name, EnumQualifiedNameSeparator separator) implements IQualifiedNamePart {
         public Part {

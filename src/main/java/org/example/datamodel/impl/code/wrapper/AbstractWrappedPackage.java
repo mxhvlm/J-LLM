@@ -20,7 +20,7 @@ public abstract class AbstractWrappedPackage<T> extends AbstractWrappedElement<T
     @Override
     public void resolve(CodeObjectRegistry registry) {
         super.resolve(registry);
-        
+
         _subTypes.addAll(resolveSubTypes(registry));
         _subPackages.addAll(resolveSubPackages(registry));
     }
@@ -35,5 +35,6 @@ public abstract class AbstractWrappedPackage<T> extends AbstractWrappedElement<T
 
     // Hook methods providing lib-specific resolution logic
     protected abstract List<IType> resolveSubTypes(CodeObjectRegistry registry);
+
     protected abstract List<IPackage> resolveSubPackages(CodeObjectRegistry registry);
 }

@@ -19,9 +19,9 @@ public class WrappedCtParameter extends AbstractWrappedParameter {
             return Optional.empty();
         }
         return Optional.of(
-            registry.getRegister(IType.class).getOrCreate(
-                QualifiedNameFactory.fromCtElement(getWrappedObject()),
-                () -> new WrappedCtType(getWrappedObject().getType().getTypeDeclaration()))
+                registry.getRegister(IType.class).getOrCreate(
+                        QualifiedNameFactory.fromCtElement(getWrappedObject()),
+                        () -> new WrappedCtType(getWrappedObject().getType().getTypeDeclaration()))
         );
     }
 }

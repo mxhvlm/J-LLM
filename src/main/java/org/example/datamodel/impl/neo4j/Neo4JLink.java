@@ -9,8 +9,13 @@ public record Neo4JLink(
         String node1Prop,
         String node2Prop
 ) {
+    @Override
+    public int hashCode() {
+        return java.util.Objects.hash(label, node1, node2, node1Label, node2Label, node1Prop, node2Prop);
+    }
+
     public static class Builder {
-            private String _label;
+        private String _label;
         private String _node1;
         private String _node2;
         private String _node1Label;
@@ -109,10 +114,6 @@ public record Neo4JLink(
             }
 
             return new Neo4JLink(_label, _node1, _node2, _node1Label, _node2Label, _node1Prop, _node2Prop);
-        } }
-
-    @Override
-    public int hashCode() {
-        return java.util.Objects.hash(label, node1, node2, node1Label, node2Label, node1Prop, node2Prop);
+        }
     }
 }

@@ -13,12 +13,6 @@ import java.util.stream.Stream;
 public class TransformerStep implements IPipelineStep<Stream<IType>, Stream<TransformerStep.ITypeOutput>> {
     private static final Logger LOGGER = LoggerFactory.getLogger(TransformerStep.class);
 
-    public sealed interface ITypeOutput permits TypeNode, TypeLink {}
-
-    public record TypeNode(Neo4jType object) implements ITypeOutput {}
-
-    public record TypeLink(Neo4JLink link) implements ITypeOutput {}
-
     @Override
     public Stream<ITypeOutput> process(Stream<IType> input) {
         LOGGER.info("TypeExporter: Processing types...");
@@ -97,5 +91,14 @@ public class TransformerStep implements IPipelineStep<Stream<IType>, Stream<Tran
         });
 
         return builder.build();
+    }
+
+    public sealed interface ITypeOutput permits TypeNode, TypeLink {
+    }
+
+    public record TypeNode(Neo4jType object) implements ITypeOutput {
+    }
+
+    public record TypeLink(Neo4JLink link) implements ITypeOutput {
     }
 }

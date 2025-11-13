@@ -4,5 +4,5 @@ import org.example.integration.api.IApiResponse;
 
 public interface ILLMProvider {
 
-    IApiResponse<String> getLLMResponse(LLMConfig config, String input);
+    IApiResponse<String> getLLMResponse(ILLMConfig config, String input);
 }

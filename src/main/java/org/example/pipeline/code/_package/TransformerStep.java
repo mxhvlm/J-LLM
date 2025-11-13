@@ -6,16 +6,12 @@ import org.example.pipeline.IPipelineStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
 
 public class TransformerStep implements IPipelineStep<Stream<String>, Stream<TransformerStep.IPackageOutput>> {
     private static final Logger LOGGER = LoggerFactory.getLogger(TransformerStep.class);
-
-    public sealed interface IPackageOutput permits PackageNode, PackageLink {}
-    public record PackageNode(Neo4jPackage object) implements IPackageOutput {}
-    public record PackageLink(Neo4JLink link) implements IPackageOutput {}
-
 
     @Override
     public Stream<IPackageOutput> process(Stream<String> input) {
@@ -48,6 +44,15 @@ public class TransformerStep implements IPipelineStep<Stream<String>, Stream<Tra
             parentPath = currentPath;
         }
         return results.stream();
+    }
+
+    public sealed interface IPackageOutput permits PackageNode, PackageLink {
+    }
+
+    public record PackageNode(Neo4jPackage object) implements IPackageOutput {
+    }
+
+    public record PackageLink(Neo4JLink link) implements IPackageOutput {
     }
 }
 

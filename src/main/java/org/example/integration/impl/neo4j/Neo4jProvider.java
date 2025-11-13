@@ -6,11 +6,10 @@ import org.neo4j.driver.*;
 import org.slf4j.Logger;
 
 public class Neo4jProvider implements AutoCloseable, INeo4jProvider {
+    private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(Neo4jProvider.class);
     private final Driver _driver;
     private final Session _session;
     private Transaction _transaction;
-
-    private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(Neo4jProvider.class);
 
     public Neo4jProvider(String uri, String user, String password) {
         LOGGER.info("Connecting to Neo4j at " + uri + " with user " + user);
@@ -51,6 +50,7 @@ public class Neo4jProvider implements AutoCloseable, INeo4jProvider {
             _transaction = _session.beginTransaction();
         }
     }
+
     @Override
     public Result runCypher(String cypher) {
         return runCypher(cypher, Values.parameters());

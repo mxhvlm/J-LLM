@@ -38,7 +38,7 @@ class QualifiedNameFactory {
         ArrayDeque<IQualifiedName.IQualifiedNamePart> parts = new ArrayDeque<>();
 
         CtElement current = element;
-        while(true) {
+        while (true) {
             if (current instanceof CtNamedElement namedElement) {
                 String name;
                 if (current instanceof CtMethod<?> method) {

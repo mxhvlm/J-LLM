@@ -17,8 +17,9 @@ public class ExtractorStep implements IPipelineStep<Stream<IType>, Stream<IMetho
         return types
                 .map(IType::getMethods)
                 .flatMap(Collection::stream)
-            .distinct();
+                .distinct();
     }
+
     @Override
     public Stream<IMethod> process(Stream<IType> input) {
         return extractMethods(input);

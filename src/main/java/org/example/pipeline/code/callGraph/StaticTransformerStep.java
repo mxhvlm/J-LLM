@@ -14,55 +14,57 @@ import java.util.stream.Stream;
 import static org.example.pipeline.code.SafeExtractor.safelyExtract;
 
 public class StaticTransformerStep implements IPipelineStep<
-    Pair<CodeModel, Stream<? extends CtExecutableReference<?>>>, Stream<Neo4JLink>> {
+        Pair<CodeModel, Stream<? extends CtExecutableReference<?>>>, Stream<Neo4JLink>> {
     private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(StaticTransformerStep.class);
 
-    public sealed interface IStaticCallGraphOutput permits StaticTransformerStep.StaticCall {}
+    @Override
+    public Stream<Neo4JLink> process(Pair<CodeModel, Stream<? extends CtExecutableReference<?>>> input) {
+        LOGGER.info("StaticCallGraphTransformer: Linking method calls...");
+        return input
+                .getRight()
+                .filter(executableRef -> {
+                    // Filter out static calls to constructors
+                    if (executableRef.getDeclaringType() == null) {
+                        LOGGER.info(
+                                "Executable reference {} has no declaring type. Skipping.",
+                                executableRef.getSignature());
+                        return false;
+                    }
+                    CtTypeReference<?> declaringType = executableRef.getDeclaringType();
+                    return declaringType != null && !declaringType.isPrimitive();
+                })
+                .map(executableRef -> {
+                    CtTypeReference<?> declaringType = executableRef.getDeclaringType();
+                    // Callee
+                    String calleeMethodId = declaringType.getQualifiedName() + "#" + executableRef.getSignature();
 
-    record StaticCall(Neo4JLink object) implements IStaticCallGraphOutput {}
+                    // Try to find the calling method by walking up from the reference's parent
+                    String callerMethodId = safelyExtract(() -> {
+                        if (executableRef.getParent() == null) {
+                            throw new IllegalStateException("No parent for executable reference.");
+                        }
+                        return executableRef.getParent()
+                                .getParent(CtMethod.class) // traverse up the tree to find the enclosing method
+                                .getDeclaringType().getQualifiedName()
+                                + "#"
+                                + executableRef.getParent().getParent(CtMethod.class).getSignature();
+                    }, "ERROR#ERROR", LOGGER);
 
-  @Override
-  public Stream<Neo4JLink> process(Pair<CodeModel, Stream<? extends CtExecutableReference<?>>> input) {
-    LOGGER.info("StaticCallGraphTransformer: Linking method calls...");
-    return input
-        .getRight()
-        .filter(executableRef -> {
-          // Filter out static calls to constructors
-          if (executableRef.getDeclaringType() == null) {
-            LOGGER.info(
-                "Executable reference {} has no declaring type. Skipping.",
-                executableRef.getSignature());
-            return false;
-          }
-          CtTypeReference<?> declaringType = executableRef.getDeclaringType();
-          return declaringType != null && !declaringType.isPrimitive();
-        })
-        .map(executableRef -> {
-          CtTypeReference<?> declaringType = executableRef.getDeclaringType();
-          // Callee
-          String calleeMethodId = declaringType.getQualifiedName() + "#" + executableRef.getSignature();
+                    LOGGER.trace("Linking method {} calls {}", callerMethodId, calleeMethodId);
 
-          // Try to find the calling method by walking up from the reference's parent
-          String callerMethodId = safelyExtract(() -> {
-            if (executableRef.getParent() == null) {
-              throw new IllegalStateException("No parent for executable reference.");
-            }
-            return executableRef.getParent()
-                .getParent(CtMethod.class) // traverse up the tree to find the enclosing method
-                .getDeclaringType().getQualifiedName()
-                + "#"
-                + executableRef.getParent().getParent(CtMethod.class).getSignature();
-          }, "ERROR#ERROR", LOGGER);
+                    return Neo4JLink.Builder.create()
+                            .withLabel("CALLS_STATIC")
+                            .betweenLabels("Method")
+                            .betweenProps("id")
+                            .parentValue(callerMethodId)
+                            .childValue(calleeMethodId)
+                            .build();
+                });
+    }
 
-          LOGGER.trace("Linking method {} calls {}", callerMethodId, calleeMethodId);
+    public sealed interface IStaticCallGraphOutput permits StaticTransformerStep.StaticCall {
+    }
 
-          return Neo4JLink.Builder.create()
-              .withLabel("CALLS_STATIC")
-              .betweenLabels("Method")
-              .betweenProps("id")
-              .parentValue(callerMethodId)
-              .childValue(calleeMethodId)
-              .build();
-        });
-  }
+    record StaticCall(Neo4JLink object) implements IStaticCallGraphOutput {
+    }
 }
