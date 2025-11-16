@@ -1,0 +1,8 @@
+package com.mxhvlm.jllm.core.integration.impl.redmine.wiki;
+
+import java.util.Collection;
+
+record RedminePageListDTO(Collection<RedminePageListObjectDTO> wiki_pages) {
+    record RedminePageListObjectDTO(String title, String version, String created_on, String updated_on) {
+    }
+}
